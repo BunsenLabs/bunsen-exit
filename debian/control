@@ -1,40 +1,17 @@
-Source: bunsen-utilities
+Source: bunsen-exit
 Section: misc
 Priority: extra
 Maintainer: John Crawley <john@bunsenlabs.org>
 Build-Depends: debhelper (>= 9), dh-systemd (>= 1.5)
 Standards-Version: 3.9.5
-Homepage: https://github.com/BunsenLabs/bunsen-utilities
-Vcs-Git: https://github.com/BunsenLabs/bunsen-utilities.git
-Vcs-Browser: https://github.com/BunsenLabs/bunsen-utilities.git
+Homepage: https://github.com/BunsenLabs/bunsen-exit
+Vcs-Git: https://github.com/BunsenLabs/bunsen-exit.git
+Vcs-Browser: https://github.com/BunsenLabs/bunsen-exit.git
 
-Package: bunsen-utilities
+Package: bunsen-exit
 Architecture: all
-Depends: ${misc:Depends}, bunsen-common, python2.7, python-gtk2, python-xlib, upower, yad, wmctrl, xdotool (>=1:2.20110530.1-3), python-dbus, libnotify-bin
-Conflicts: bunsen-exit, bunsen-lock, bunsen-user-setup, bunsen-wmhacks
-Recommends: gmrun, light-locker, openbox, nitrogen | feh, scrot, tint2, bunsen-conky, systemd
-Description: Small scripts to use with BunsenLabs.
- A collection of small scripts to provide various functions
- which might be useful to BunsenLinux users and system administrators.
- .
-  - bl-aerosnap: Script to add aero style window snapping to Openbox.
-  - bl-conky-session: Script to handle multiple conky sessions.
-  - bl-conkyedit: Script to find and edit conky config files.
-  - bl-conkypin: Script to assist the relocation of conky windows.
-  - bl-conkyzen: Yad-based conky manager.
-  - bl-exit: Logout dialog box with various options.
-  - bl-hotcorners: Script to add hot corners to Openbox.
-  - bl-kb: Script to manage keyboard shortcuts.
-  - bl-lock: Script to lock the display.
-  - bl-obthemes: Script to save or restore openbox gui configurations.
-  - bl-tint2-session: Script to handle multiple tint2 sessions.
-  - bl-tint2edit: Script to find and edit tint2 config files.
-  - bl-tint2restart: Script to restart all running tint2 processes.
-  - bl-tint2zen: Yad-based tint2 manager.
-  - bl-package-versions: Utility to display the versions of BunsenLabs packages.
-  - bl-github-upgrade: Script to upgrade the BunsenLabs packages from GitHub.
-  - bl-xinerama-prop: Script to get xinerama properties in a shell script
-  - bl-notify-broadcast: Script to send user notifications from root processes.
- .
- Originally imported from cb-exit, cb-lock and cb-wmhacks,
- made for CrunchBang Linux and subsequently modified for BunsenLabs.
+Depends: ${misc:Depends}, systemd, python2.7, python-gtk2
+Recommends: light-locker
+Description: Bunsen logout script.
+ GUI logout/suspend/reboot/poweroff script.
+
