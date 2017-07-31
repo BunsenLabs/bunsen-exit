@@ -1,3 +1,9 @@
+bunsen-exit (9.1.1-2) helium; urgency=medium
+
+  * Bugfix: incorrectly named debian/install file.
+
+ -- John Crawley <john@bunsenlabs.org>  Mon, 31 Jul 2017 12:23:30 +0900
+
 bunsen-exit (9.1.1-1) helium; urgency=medium
 
   * (damo) Set Helium theme as default.
