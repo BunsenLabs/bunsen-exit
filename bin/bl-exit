@@ -519,7 +519,7 @@ if display:
 
         def construct_ui(self):
             # get width of the monitor where the cursor is
-            width = 800
+            width = 800 # fallback width
             try:
                 display=gtk.gdk.Display(gtk.gdk.get_display())
                 screen, x, y, flags=display.get_pointer()
@@ -547,7 +547,7 @@ if display:
                 self.on_debug("dialogHeight is not set or is not an int")
                 self.icon_heights = []
                 pass
-
+            self.icon_widths = []
             # Cancel key (Escape)
             accelgroup = gtk.AccelGroup()
             key, mod = gtk.accelerator_parse('Escape')
@@ -573,13 +573,24 @@ if display:
             for button in self.bva:
                 (action, label, actionfunc, method, show, onError) = button
                 if not show == 0:
-                    self.add_button(show, actionfunc, label=label, btype=actionToMethod[action])
+                    icon_width = self.add_button(show, actionfunc, label=label, btype=actionToMethod[action])
+                    #get list of returned icon widths
+                    self.icon_widths.append(icon_width)
             self.status = gtk.Label()
 
             if len(self.icon_heights) > 0:
                 self.dialogHeight = max(self.icon_heights)
             else:
                 self.dialogHeight = -1
+                
+            # set minimum window width
+            icons_total_w = sum(self.icon_widths)
+            spaces = self.configured_theme.settings.get('buttonSpacing', 0)
+            spacing_total = int(len(self.icon_widths))*spaces*2
+            
+            if sum(self.icon_widths) > width:
+                width = sum(self.icon_widths) + spacing_total
+            
             self.window.set_size_request(width, self.dialogHeight)
 
             vbox = gtk.VBox()
@@ -624,7 +635,8 @@ if display:
             _filename = find_image_file_for_button()
             if _filename is not None:
                 image.set_from_file(_filename)
-                self.icon_heights.append(self.get_image_info(_filename))
+                icon_w,icon_h = self.get_image_info(_filename)
+                self.icon_heights.append(icon_h)
             else:
                 image.set_from_file('/usr/share/gtk-doc/html/pygtk/icons/stock_broken_image_24.png')
                 self.on_warning("image file for '{}' not found.".format(str(btype)))
@@ -637,18 +649,20 @@ if display:
             self.button_box.pack_start(button, expand=True, fill=True, padding=0)
 
             self.tooltips.set_tip(button, str(btype))
+            return icon_w
 
         def get_image_info(self, img_path):
-            '''Test if icon is png, and get icon height(px)'''
+            '''Test if icon is png, and get icon width(px),icon height(px)'''
+            width = -1
             height = -1
             try:
                 with open(img_path, 'rb') as f:
                     data = f.read()
                 if data[:8] == '\211PNG\r\n\032\n' and (data[12:16] == 'IHDR'): # check if png
-                    _, height = struct.unpack('>LL', data[16:24])
+                    width, height = struct.unpack('>LL', data[16:24])
             except:
                 self.on_warning("get_image_info failed for '{}'".format(img_path))
-            return height
+            return width,height
 
 
 def print_message(m):
