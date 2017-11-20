@@ -1,0 +1,21 @@
+
+
+
+
+
+class CanDoItError(Exception):
+    pass
+
+
+
+
+
+
+    
+
+    
+
+
+    
+
+    
