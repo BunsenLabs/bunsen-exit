@@ -11,37 +11,14 @@
 #
 #
 ### BUTTONS ############################################################
-[cancel]
-show = always
-onerror = novisual
-
-[logout]
-show = always
-onerror = novisual
-
-[suspend]
-show = always
-onerror = novisual
-
-[sleep]
-show = always
-onerror = novisual
-
-[hibernate]
-show = never
-onerror = novisual
-
-[hybridsleep]
-show = never
-onerror = novisual
-
-[reboot]
-show = always
-onerror = novisual
-
-[poweroff]
-show = always
-onerror = novisual
+[button_values]
+Cancel = show
+Logout = show
+Suspend = show
+Reboot = show
+PowerOff = show
+Hibernate = show
+HybridSleep = show
 
 [style]
 dir = styles

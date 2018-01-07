@@ -5,7 +5,7 @@
 
 style "window"
 {
-  bg[NORMAL] = '#284F63'
+   bg[NORMAL] = '#284F63'
 }
 
 
@@ -13,14 +13,32 @@ style "button"
 {
 # This shows all the possible states for a button.  
   
-    bg[ACTIVE] = '#73919C'
+    bg[ACTIVE] = '#678B8B'
     bg[PRELIGHT] = '#678B8B'
+    bg[SELECTED] = '#73919C'
+    bg[NORMAL] = '#678B8B'
 
+}
+
+style "label"
+{
+	fg[NORMAL] = '#00FFFF'
+}
+
+style "tooltip"
+{
+	bg[NORMAL] = '#284F63'
 }
 
 # These set the widget types to use the styles defined above.
 # The widget types are listed in the class hierarchy, but could probably be
 # just listed in this document for the users reference.
 
-widget "blexit" style "window"
+# If the Window widget listed below is not set to "Bunsen Exit"
+# The window background will silently fail, despite the rcfile
+# being succesfully loaded and parsed.
+
+widget "Bunsen Exit" style "window"
 class "GtkButton"  style:highest "button"
+class "GtkLabel" style "label"
+class "GtkTooltips" style "tooltip"
