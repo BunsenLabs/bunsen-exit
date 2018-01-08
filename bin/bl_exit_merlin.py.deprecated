@@ -1,0 +1,180 @@
+from bl_exit import BL_Exit
+from bl_exit_theme import BL_Exit_Theme
+import ConfigParser
+import pygtk
+pygtk.require('2.0')
+import gtk
+import os
+
+class BL_Exit_Merlin(BL_Exit):
+	"""A dialog offering the user tobl_exit log out, suspend, reboot or shut down.
+	With a graphical UI initially developed by MerlinElMago.
+	:param cp: ConfigParser instance
+	:param config_file: path to blexit config file
+	"""
+	def __init__(self, cp, config_file):
+		BL_Exit.__init__(self, cp, config_file)
+		self.window.set_decorated(False)
+		self.tooltips = gtk.Tooltips()
+
+	def configure(self):
+		BL_Exit.configure(self)
+		default_theme = BL_Exit_Theme('dark', default_theme_settings, self)
+		self.configured_theme = BL_Exit_Theme(self.cp.get('theme', 'theme'), dict(), self)
+		self.configured_theme.set_details_from_config(self.cp, default_theme)
+		print_message('Loading theme \'' + self.configured_theme.settings.get('name', self.configured_theme.theme) + '\' by ' +
+					  self.configured_theme.settings.get('author', 'not set'))
+
+	def construct_ui(self):
+		# get width of the monitor where the cursor is
+		width = 800 # fallback width
+		try:
+			display=gtk.gdk.Display(gtk.gdk.get_display())
+			screen, x, y, flags=display.get_pointer()
+			curmon = screen.get_monitor_at_point(x, y)
+			_, _, screenwidth, _ = screen.get_monitor_geometry(curmon)
+		except:
+			# Enter a [debug] log here
+			BL_Exit.on_error('Error in construct_ui: Not running under X')
+		finally:
+			del x, y, display, screen, curmon
+
+		try:
+			_width_adjustment = float(self.configured_theme.settings.get('windowWidthAdjustment', 0))
+			if _width_adjustment > 0:
+				width = int( screenwidth*_width_adjustment)
+			if width > screenwidth:
+				width = -1
+		except:
+			# Enter a [debug] log here
+			self.on_debug('Problem with windowWidthAdjustment')
+
+		# self.icon_heights is initialized here, and appended to in add_button
+		# Delay setting window dimensions until after building self.bva
+		try:
+			self.icon_heights = [int(self.configured_theme.settings.get('dialogHeight'))]
+		except:
+			self.on_debug("dialogHeight is not set or is not an int")
+			self.icon_heights = []
+			pass
+		self.icon_widths = []
+		# These accel keys may not be needed
+		# Cancel key (Escape)
+		accelgroup = gtk.AccelGroup()
+		key, mod = gtk.accelerator_parse('Escape')
+		accelgroup.connect_group(key, mod, gtk.ACCEL_VISIBLE, gtk.main_quit)
+		self.window.add_accel_group(accelgroup)
+
+		self.button_box = gtk.HBox()
+		self.button_box.set_spacing(0)
+
+		try:
+			self.button_box.set_size_request(-1, int(self.configured_theme.settings.get('dialogHeight', -1)))
+		except:
+			# Enter a debug log here
+			self.on_debug("dialogHeight is not set or is not an int")
+			pass
+
+		try:
+			self.button_box.set_spacing(int(self.configured_theme.settings.get('buttonSpacing', 0)))
+		except:
+			# Enter a debug log here
+			self.on_debug("dialogHeight is not set or is not an int")
+			pass
+
+		self.build_button_visibility_array()
+		for button in self.bva:
+			(action, label, actionfunc, method, show, onError) = button
+			if not show == 0:
+				icon_width = self.add_button(show, actionfunc, label=label, btype=actionToMethod[action])
+				#get list of returned icon widths
+				self.icon_widths.append(icon_width)
+		self.status = gtk.Label()
+
+		if len(self.icon_heights) > 0:
+			self.dialogHeight = max(self.icon_heights)
+		else:
+			self.dialogHeight = -1
+			
+		# set minimum window width
+		icons_total_w = sum(self.icon_widths)
+		spaces = self.configured_theme.settings.get('buttonSpacing', 0)
+		spacing_total = int(len(self.icon_widths))*spaces*2
+		
+		if sum(self.icon_widths) > width:
+			width = sum(self.icon_widths) + spacing_total
+		
+		self.window.set_size_request(width, self.dialogHeight)
+
+		vbox = gtk.VBox()
+		vbox.pack_start(self.button_box)
+		self.window.add(vbox)
+		self.window.set_opacity(0)
+		self.window.show_all()
+		try:
+			for o in range(1, int(self.configured_theme.settings.get('overallOpacity'))):
+				sleep(float(self.configured_theme.settings.get('sleepDelay')))
+				while gtk.events_pending():
+					gtk.main_iteration(False)
+					self.window.set_opacity(float(o)/100.0)
+		except:
+			self.on_debug("Opacity is not fully configured")
+			pass
+		self.window.set_keep_above(True)
+
+	def main(self):
+		self.configure()
+		self.set_custom_style()
+		self.construct_ui()
+		gtk.main()
+	
+	def add_button(self, show, action, label=None, btype=None):
+	
+		def find_image_file_for_button():
+			_filename = self.configured_theme.settings.get('buttonImage' + str(btype), 'nonexistant')
+			if _filename is None:
+				return None
+			_iconpath = self.configured_theme.settings.get('iconpath')
+			if _iconpath is None:
+				return None
+			for _dir in _iconpath.split(os.pathsep):
+				_dir = os.path.expanduser(_dir)
+				if os.path.exists(os.path.join(_dir, _filename)):
+					return os.path.join(_dir, _filename)
+	
+		button = gtk.Button()
+		button.set_relief(gtk.RELIEF_NONE)
+		image = gtk.Image()
+		_filename = find_image_file_for_button()
+		if _filename is not None:
+			image.set_from_file(_filename)
+			icon_w,icon_h = self.get_image_info(_filename)
+			self.icon_heights.append(icon_h)
+		else:
+			image.set_from_file('/usr/share/gtk-doc/html/pygtk/icons/stock_broken_image_24.png')
+			self.on_warning("image file for '{}' not found.".format(str(btype)))
+		button.set_image(image)
+	
+		if show == 3:
+			button.set_sensitive(False)
+		button.set_border_width(0)
+		button.connect("clicked", action)
+		# Set Focus when clicked?
+		self.button_box.pack_start(button, expand=True, fill=True, padding=0)
+	
+		self.tooltips.set_tip(button, str(btype))
+		return icon_w
+	
+	def get_image_info(self, img_path):
+		'''Test if icon is png, and get icon width(px),icon height(px)'''
+		width = -1
+		height = -1
+		try:
+			with open(img_path, 'rb') as f:
+				data = f.read()
+			if data[:8] == '\211PNG\r\n\032\n' and (data[12:16] == 'IHDR'): # check if png
+				width, height = struct.unpack('>LL', data[16:24])
+		except:
+			# Log a [warn] here
+			self.on_warning("get_image_info failed for '{}'".format(img_path))
+		return width,height

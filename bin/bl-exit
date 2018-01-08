@@ -1,0 +1,168 @@
+#!/usr/bin/env python2.7
+# -*- coding: utf-8 -*-
+#
+#    bl-exit: Bunsenlabs exit dialog, offering various exit options
+#     via both GUI and CLI
+#    Copyright (C) 2012 Philip Newborough  <corenominal@corenominal.org>
+#    Copyright (C) 2016 xaos52  <xaos52@gmail.com>
+#    Copyright (C) 2017 damo  <damo@bunsenlabs.org>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import print_function
+
+import os
+display = os.environ.get('DISPLAY') is not None
+
+import sys
+import getpass
+import subprocess
+import struct
+import ConfigParser
+import argparse
+from bl_exit_base import BL_Exit_Base
+from bl_exit import BL_Exit
+if display:
+    """Testing for display here because we want to be able to run the script
+    in a non-graphical environment as well. Without the test, importing
+    gtk.Window in a non-graphical environment spits out some errors and crashes
+    the application."""
+    import pygtk
+    pygtk.require('2.0')
+    import gtk
+    from time import sleep
+
+__me__ = 'bl-exit'
+__version__ = '2.2.1'
+
+# Translate command-line option to method - command line only
+actionToMethod = dict(
+	cancel='Cancel', c='Cancel',
+	logout='Logout', l='Logout',
+	suspend='Suspend', s='Suspend',
+	hybridsleep='HybridSleep', y='HybridSleep',
+	hibernate='Hibernate', i='Hibernate',
+	reboot='Reboot', b='Reboot',
+	poweroff='PowerOff', p='PowerOff'
+)
+
+def print_message(m):
+		print (str(m), file=sys.stderr)
+
+def get_options():
+	result = None
+	parser = argparse.ArgumentParser(description="Bunsenlabs exit")
+	if display:
+		parser.add_argument("-l", "--logout", help="Log out",
+							action="store_true")
+		parser.add_argument("-s", "--suspend", help="Suspend",
+							action="store_true")
+		parser.add_argument("-i", "--hibernate", help="Hibernate",
+							action="store_true")
+		parser.add_argument("-y", "--hybridsleep", help="Hybrid sleep",
+							action="store_true")
+		parser.add_argument("-b", "--reboot", help="Reboot",
+							action="store_true")
+		parser.add_argument("-p", "--poweroff", help="Power off",
+							action="store_true")
+		parser.parse_args(sys.argv[1:])
+	"""No check if more than one option was specified. Take the first option and
+	discard the other"""
+	result = parser.parse_args()
+	return result
+
+def get_config_file():
+	"""Determine config directory: first try the environment variable
+	XDG_CONFIG_HOME according to XDG specification and as a fallback
+	use ~/.config/bl-exit. Use /etc/bl-exit/bl-exitrc as a last
+	resort."""
+	config_file = None
+	config_dirs = []
+	xdg_config_dir = os.getenv('XDG_CONFIG_HOME')
+	if xdg_config_dir:
+		config_dirs.append(xdg_config_dir)
+	user_config_dir = os.path.expanduser('~/.config')
+	try:
+		if not (xdg_config_dir and os.path.samefile(user_config_dir,
+													xdg_config_dir)):
+			config_dirs.append(user_config_dir)
+	except OSError as e:
+		# Put a [warn] log here here
+		print_message(e)
+		pass
+	config_dirs.append('/etc')
+	for config_dir in config_dirs:
+		config_dir = config_dir + '/bl-exit'
+		if os.path.isdir(config_dir):
+			maybe_config_file = config_dir + '/bl-exitrc'
+			if os.path.isfile(maybe_config_file):
+				config_file = maybe_config_file
+				break
+
+	return config_file
+
+def get_config_theme_entry(section, item, cp):
+	"""Get 'theme' entry from [theme] section.
+	:param
+	  section: String, config section
+	  item:    String, config item
+	  cp:      ConfigParser, instance
+	:out
+	  string or None"""
+	if (cp.has_section(section)):
+		try:
+			_item = cp.get(section, item)
+			# Put a [warn] log here
+		except ConfigParser.NoOptionError:
+			_item = None
+		return _item
+	else:
+		return None
+
+def main():
+	'''
+	The script works both in a graphical and a non-graphical environment.
+
+	In a graphical environment, the BlExitWindow instance is only shown when
+	the script is launched without arguments. The user selects the action she
+	wants by clicking the right button.
+
+	WHen  the script is launched In a non-graphical environment the requested
+	action should be one of the accepted arguments and the action is executed
+	without asking for confirmation - as if the script was launched from the
+	command line.
+
+	In a non-graphical environment, one of the accepted actions must be
+	specified as an argument.
+	'''
+	if display and len(sys.argv[1:]) == 0:
+		try:
+			cp = ConfigParser.RawConfigParser()
+			config_file = get_config_file()
+			cp.read(config_file)
+			_theme = get_config_theme_entry('theme', 'theme', cp)
+			blexit = BL_Exit(cp, config_file)
+		except ConfigParser.ParsingError as e:
+			print_message(str(e))
+			return 1
+		except ConfigParser.NoOptionError as e:
+			print_message(str(e))
+			blexit = Bl_Exit(cp, config_file)
+	else:
+		blexit = BL_Exit_Base()
+
+	return blexit.main()
+
+if __name__ == "__main__":
+	sys.exit(main())
