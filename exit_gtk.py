@@ -100,16 +100,11 @@ class ExitGtk:
 		gtk.main()
 
 
-	def query_tooltip_custom_cb(self, widget, x, y, keyboard_tip, tooltip, tooltip_label, tooltip_window, key):
-		bg_color = gtk.gdk.color_parse(self.theme_entries['window_background_normal'])
+	def query_tooltip_custom_cb(self, widget, x, y, keyboard_tip, tooltip, key, tooltip_label, tooltip_window):
 		fg_color = self.theme_entries['text_color_normal']
 		label_markup = '<span foreground="' + fg_color + '">' + key + '</span>'
-		#tooltip.modify_bg(gtk.STATE_NORMAL, bg_color)
-		# create the label
 		tooltip_label.set_markup(label_markup)
-		tooltip_window.modify_bg(gtk.STATE_NORMAL, bg_color)
 		tooltip_label.show()
-		tooltip_window.show()
 		return True
 
 	def add_buttons(self, key, theme_entries, button_box):
@@ -124,7 +119,7 @@ class ExitGtk:
 			self.color_button = ColoredImageButton(key, button_image, self.theme_entries)
 			self.color_button.set_name(key)
 			frame = gtk.Frame()
-			frame.set_border_width(2)
+			frame.set_border_width(1)
 			frame.add(self.color_button)
 			button_box.add(frame)
 		else:
@@ -134,24 +129,20 @@ class ExitGtk:
 			self.color_button.set_relief(gtk.RELIEF_NONE)
 			self.color_button.set_label(key)
 			button_box.add(self.button)
-		self.color_button.set_border_width(0)
-		tooltip_label = gtk.Label()
+		# Add custom tooltips
 		tooltip_window = gtk.Window(gtk.WINDOW_POPUP)
-		bg_color = gtk.gdk.color_parse(theme_entries['window_background_normal'])
-		fg_color = self.theme_entries['text_color_normal']
-		label_markup = '<span foreground="' + fg_color + '">' + key + '</span>'
-		# create the label
-		tooltip_label.set_markup(label_markup)
+		tooltip_label = gtk.Label()
+		tooltip_label.set_use_markup(True)
+		bg_color = gtk.gdk.color_parse(self.theme_entries['window_background_normal'])
 		tooltip_window.modify_bg(gtk.STATE_NORMAL, bg_color)
+		self.color_button.connect("query-tooltip", self.query_tooltip_custom_cb, key, tooltip_label, tooltip_window)
 		self.color_button.set_tooltip_window(tooltip_window)
 		tooltip_window.add(tooltip_label)
-		self.color_button.connect("query-tooltip", self.query_tooltip_custom_cb, tooltip_label, tooltip_window, key)
-		self.color_button.props.has_tooltip = True
+		# Show the custom button
 		button_box.show()
 		self.color_button.show()
-		
 		return
-		
+
 	def configure(self, theme, theme_entries):
 		# There is probably something I need to do here.
 		#self.configured_theme.set_details_from_config(self.cp, default_theme)

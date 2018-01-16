@@ -64,7 +64,7 @@ button_background_normal=#73919C
 button_background_prelight=#678B8B
 # Text Colors
 text_color_normal=#00ffff
-text_color_prelight=#ffffff
+text_color_prelight=#000000
 
 [bunsen-small]
 name = Default small Bunsen theme
