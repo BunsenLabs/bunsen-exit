@@ -1,15 +1,15 @@
 import pygtk
 pygtk.require('2.0')
 import gtk
+import gobject
 import logging
 import collections
-import colored_button
+from colored_image_button import ColoredImageButton
 
 exit_log = logging.getLogger('Bunsen-Exit-Log')
 
 
 class ExitGtk:
-	style_entries = [ ]
 	exit_bus = ''
 	color_button = None
 	window = None
@@ -53,9 +53,10 @@ class ExitGtk:
 		self.window.hide_all()
 		gtk.main_quit()
 
-	def __init__(self, button_values, exit_bus, theme, theme_entries, style_entries, style_path):
-		self.style_entries = style_entries
+	def __init__(self, button_values, exit_bus, theme, theme_entries, style_path):
+		self.theme_entries = theme_entries
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		# Format the window.
 		self.window.set_name('Bunsen Exit')
 		self.window.set_decorated(False)
 		self.window.connect("delete_event", self.destroy)
@@ -67,6 +68,7 @@ class ExitGtk:
 		self.window.set_position(gtk.WIN_POS_CENTER)
 		windowicon = self.window.render_icon(gtk.STOCK_QUIT, gtk.ICON_SIZE_DIALOG)
 		self.window.set_icon(windowicon)
+		self.window.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['window_background_normal']))
 		button_box = gtk.HButtonBox()
 		button_box.set_layout(gtk.BUTTONBOX_SPREAD)
 		for key, value in button_values.iteritems():
@@ -88,11 +90,9 @@ class ExitGtk:
 			# only add buttons that are to be shown
 			if value == 'show':
 				exit_log.info('Creating button for ' + key)
-				self.add_buttons(key, theme_entries, button_box, style_entries)
+				self.add_buttons(key, self.theme_entries, button_box)
+				gobject.type_register(ColoredImageButton)
 		self.window.add(button_box)
-		# Set the style
-		if style_path:
-			self.set_style(style_path)
 		self.window.show_all()
 		return
 
@@ -100,23 +100,28 @@ class ExitGtk:
 		gtk.main()
 
 
-	def query_tooltip_custom_cb(self, widget, x, y, keyboard_tip, tooltip, style_entries):
-		if 'NORMAL' in style_entries:
-			color = gtk.gdk.color_parse(style_entries[ 'NORMAL' ])
-			window = widget.get_tooltip_window()
-			window.modify_bg(gtk.STATE_NORMAL, color)
+	def query_tooltip_custom_cb(self, widget, x, y, keyboard_tip, tooltip, tooltip_label, tooltip_window, key):
+		bg_color = gtk.gdk.color_parse(self.theme_entries['window_background_normal'])
+		fg_color = self.theme_entries['text_color_normal']
+		label_markup = '<span foreground="' + fg_color + '">' + key + '</span>'
+		#tooltip.modify_bg(gtk.STATE_NORMAL, bg_color)
+		# create the label
+		tooltip_label.set_markup(label_markup)
+		tooltip_window.modify_bg(gtk.STATE_NORMAL, bg_color)
+		tooltip_label.show()
+		tooltip_window.show()
 		return True
 
-	def add_buttons(self, key, theme_entries, button_box, style_entries):
+	def add_buttons(self, key, theme_entries, button_box):
 		# iconpath refers to a theme_entry in bl-exitrc.
 		# It needs to refer to  a valid path. Checks for path exists
 		# and points to an image need to be added. 
-		if 'iconpath' in theme_entries:
-			icon_path = theme_entries[ 'iconpath' ]
+		if 'iconpath' in self.theme_entries:
+			icon_path = self.theme_entries[ 'iconpath' ]
 			image_key = 'buttonimage' + key.lower()
-			button_image = icon_path + "/" + theme_entries[ image_key ]
+			button_image = icon_path + "/" + self.theme_entries[ image_key ]
 			exit_log.debug("Loading theme entry " + key + " from " + button_image)
-			self.color_button = colored_button.ColoredButton(key, button_image)
+			self.color_button = ColoredImageButton(key, button_image, self.theme_entries)
 			self.color_button.set_name(key)
 			frame = gtk.Frame()
 			frame.set_border_width(2)
@@ -130,12 +135,17 @@ class ExitGtk:
 			self.color_button.set_label(key)
 			button_box.add(self.button)
 		self.color_button.set_border_width(0)
+		tooltip_label = gtk.Label()
 		tooltip_window = gtk.Window(gtk.WINDOW_POPUP)
-		tooltip_button = gtk.Label(key)
-		tooltip_window.add(tooltip_button)
-		tooltip_button.show()
+		bg_color = gtk.gdk.color_parse(theme_entries['window_background_normal'])
+		fg_color = self.theme_entries['text_color_normal']
+		label_markup = '<span foreground="' + fg_color + '">' + key + '</span>'
+		# create the label
+		tooltip_label.set_markup(label_markup)
+		tooltip_window.modify_bg(gtk.STATE_NORMAL, bg_color)
 		self.color_button.set_tooltip_window(tooltip_window)
-		self.color_button.connect("query-tooltip", self.query_tooltip_custom_cb, style_entries)
+		tooltip_window.add(tooltip_label)
+		self.color_button.connect("query-tooltip", self.query_tooltip_custom_cb, tooltip_label, tooltip_window, key)
 		self.color_button.props.has_tooltip = True
 		button_box.show()
 		self.color_button.show()
@@ -150,14 +160,4 @@ class ExitGtk:
 		else:
 			msg = 'theme and theme_entries is set to None.'
 		exit_log.info(msg)
-		return
-
-	def set_style(self, style_path):
-		try:
-			gtk.rc_parse(style_path)
-			settings = gtk.settings_get_for_screen(self.window.get_screen())
-			gtk.rc_reset_styles(settings)
-		except IOError as err:
-			exit_log.debug(err)
-			pass
 		return

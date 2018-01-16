@@ -37,13 +37,13 @@ theme = helium
 name=Helium Beam Theme
 author=BunsenLabs
 #Overall height of the dialog.
-dialogHeight=66
+dialog_height=66
 #Delay for the fade in counter
-sleepDelay=0.003
+sleep_delay=0.003
 #OverallOpacity of the dialog (0-100)
-overallOpacity=80
+overall_opacity=80
 #Space between Buttons
-buttonSpacing=10
+button_spacing=10
 # path to icon files
 iconpath=/usr/share/images/bunsen/exit/light
 #Button textures (i.e. the images on them)
@@ -55,7 +55,16 @@ buttonImageLogout=logout-sm.png
 buttonImageHybridSleep=hibernate-sm.png
 buttonImageHibernate=hibernate-sm.png
 # windowWidthAdjustment - scale factor for window width ( 0 = default, 800px; 1 = full screen width)
-windowWidthAdjustment=0.4
+window_width_adjustment=0.4
+
+# Window Background
+window_background_normal=#284F63
+# Button Background Normal
+button_background_normal=#73919C
+button_background_prelight=#678B8B
+# Text Colors
+text_color_normal=#00ffff
+text_color_prelight=#ffffff
 
 [bunsen-small]
 name = Default small Bunsen theme

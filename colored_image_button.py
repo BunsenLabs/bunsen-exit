@@ -1,4 +1,5 @@
 import gtk
+import pango
 import dbus_interface
 import logging
 
@@ -18,10 +19,10 @@ class ColoredImageButton(gtk.EventBox):
 		'''
 		self.key = key
 		self.button_image = button_image
-		self.label = gtk.Label(key)
 		self.theme_entries = theme_entries
+		self.attr = pango.AttrList()
 		#initialize superclass EventBox
-		super(ColoredButton, self).__init__()
+		super(ColoredImageButton, self).__init__()
 
 		#get a DBusInterface instance, so we can send message out.
 		self.exit_bus = dbus_interface.DbusInterface()
@@ -34,17 +35,21 @@ class ColoredImageButton(gtk.EventBox):
 
 		#activate focus
 		self.set_can_focus(True)
-
-		#align the "button" text in the middle of the box
-		self.label.set_alignment(xalign=0.5, yalign=0.5)
-		self.label.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
+		fg_color= self.theme_entries['text_color_normal']
+		label_markup = '<span foreground="' + fg_color + '">' + self.key + '</span>'
+		# create the label
+		self.label = gtk.Label()
+		self.label.set_use_markup(True)
+		self.label.set_label(label_markup)
 		self.label.modify_font(pango.FontDescription("FreeSans 12"))
+		
+		
 		#colorize the button upon init
 		self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_normal']))
 		
 
 		# Add the image_label box
-		box = self.image_label_box(self.button_image, self.key)
+		box = self.image_label_box(self.button_image, self.key, self.label)
 		self.add(box)
 		# set events
 		self.connect("button-release-event",self.clicked)
@@ -62,27 +67,38 @@ class ColoredImageButton(gtk.EventBox):
 
 	def focus_in(self, widget, event):
 		self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_prelight']))
-		self.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_prelight']))
+		fg_color = self.theme_entries['text_color_prelight']
+		label_markup = '<span foreground="' + fg_color + '">' + self.key + '</span>'
+		self.label.set_label(label_markup)
+		self.show_all()
 		return
 
 	def focus_out(self, widget, event):
 		self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_normal']))
-		self.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
+		fg_color= self.theme_entries['text_color_normal']
+		label_markup = '<span foreground="' + fg_color + '">' + self.key + '</span>'
+		self.label.set_label(label_markup)
+		self.show_all()
 
 	def mouse_in(self, widget, event):
 		self.grab_focus()
 		self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_prelight']))
-		self.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_prelight']))
+		fg_color = self.theme_entries['text_color_prelight']
+		label_markup = '<span foreground="' + fg_color + '">' + self.key + '</span>'
+		self.label.set_label(label_markup)
 		return
 
 	def mouse_out(self, widget, event):
 		self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_normal']))
-		self.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
+		fg_color= self.theme_entries['text_color_normal']
+		label_markup = '<span foreground="' + fg_color + '">' + self.key + '</span>'
+		self.label.set_label(label_markup)
+		self.show_all()
 
 	def destroy(self, widget=None, event=None, data=None):
 		gtk.main_quit()
 
-	def image_label_box(self, button_image, key):
+	def image_label_box(self, button_image, key, label):
 		# Pack the image and the label into a box
 		box = gtk.VBox()
 		image = gtk.Image()
@@ -90,7 +106,6 @@ class ColoredImageButton(gtk.EventBox):
 			image.set_from_file(button_image)
 		except IOError:
 			exit_log.warn("Unable to set button image.")
-		label = gtk.Label(key)
 		box.pack_start(image, False, False, 5)
 		box.pack_start(label, False, False, 5)
 		label.show()
