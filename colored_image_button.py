@@ -12,7 +12,7 @@ class ColoredImageButton(gtk.EventBox):
 	or create a label on one, then 
 	'''
 
-	def __init__(self, key, button_image, theme_entries):
+	def __init__(self, key, button_image, theme_entries, num_buttons, dialog_width):
 		'''
 		widget must be a gtk.Label
 		this is not checked in this simple version
@@ -21,6 +21,18 @@ class ColoredImageButton(gtk.EventBox):
 		self.button_image = button_image
 		self.theme_entries = theme_entries
 		self.attr = pango.AttrList()
+		try:
+			self.button_height = int(self.theme_entries['button_height']) + 16
+		except:
+			exit_log.warn('Unable to parse button_height. Setting to 60')
+			self.button_height = 60
+		try:
+			self.button_spacing = int(self.theme_entries['button_spacing'])
+		except:
+			exit_log.warn("Unable to parse button_spacing. Setting to 2")
+			self.button_spacing = 2
+		self.button_width = (dialog_width / num_buttons) - self.button_spacing
+		exit_log.debug("Setting button width to " + str(self.button_width))
 		#initialize superclass EventBox
 		super(ColoredImageButton, self).__init__()
 
@@ -50,6 +62,9 @@ class ColoredImageButton(gtk.EventBox):
 
 		# Add the image_label box
 		box = self.image_label_box(self.button_image, self.key, self.label)
+		# We have to add a little to height to account for the height of the labels.
+		box.set_size_request(self.button_width, self.button_height)
+		
 		self.add(box)
 		# set events
 		self.connect("button-release-event",self.clicked)
@@ -106,9 +121,8 @@ class ColoredImageButton(gtk.EventBox):
 			image.set_from_file(button_image)
 		except IOError:
 			exit_log.warn("Unable to set button image.")
-		box.pack_start(image, False, False, 5)
-		box.pack_start(label, False, False, 5)
-		label.show()
+		box.pack_start(image, False, False, 0)
+		box.pack_start(label, False, False, 0)
 		return box
 
 	def send_to_dbus(self, dbus_msg):
