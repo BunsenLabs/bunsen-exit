@@ -22,7 +22,7 @@ class ColoredImageButton(gtk.EventBox):
 		self.theme_entries = theme_entries
 		self.attr = pango.AttrList()
 		try:
-			self.button_height = int(self.theme_entries['button_height']) + 16
+			self.button_height = int(self.theme_entries['button_height'])
 		except:
 			exit_log.warn('Unable to parse button_height. Setting to 60')
 			self.button_height = 60
@@ -54,17 +54,12 @@ class ColoredImageButton(gtk.EventBox):
 		self.label.set_use_markup(True)
 		self.label.set_label(label_markup)
 		self.label.modify_font(pango.FontDescription("FreeSans 12"))
-		
-		
 		#colorize the button upon init
 		self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_normal']))
-		
-
 		# Add the image_label box
 		box = self.image_label_box(self.button_image, self.key, self.label)
 		# We have to add a little to height to account for the height of the labels.
 		box.set_size_request(self.button_width, self.button_height)
-		
 		self.add(box)
 		# set events
 		self.connect("button-release-event",self.clicked)
