@@ -1,3 +1,9 @@
+bunsen-exit (9.1.2-1~test) helium; urgency=medium
+
+  * Add keyboard accelerators for Helium theme.
+
+ -- John Crawley <john@bunsenlabs.org>  Mon, 22 Jan 2018 15:06:55 +0900
+
 bunsen-exit (9.1.1-2) helium; urgency=medium
 
   * Bugfix: incorrectly named debian/install file.
