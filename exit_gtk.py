@@ -7,13 +7,15 @@ import collections
 from colored_image_button import ColoredImageButton
 import struct
 from time import sleep
+import dbus_interface
 exit_log = logging.getLogger('Bunsen-Exit-Log')
 
 
 class ExitGtk:
-	exit_bus = ''
 	color_button = None
 	window = None
+	#get a DBusInterface instance, so we can send message out.
+	exit_bus = dbus_interface.DbusInterface()
 
 	def _key_press_event(self, widget, event):
 		keyval = event.keyval
@@ -21,10 +23,7 @@ class ExitGtk:
 		state = event.state
 		alt = (state & gtk.gdk.MOD1_MASK)
 		# Cancel shortcut
-		if alt and keyval_name == 'c':
-			self.destroy()
-		# Logout Shortcut
-		elif alt and keyval_name == 'l':
+		if alt and keyval_name == 'l':
 			self.send_to_dbus('Logout')
 		# Suspend shortcut
 		elif alt and keyval_name == 's':
@@ -212,4 +211,12 @@ class ExitGtk:
 		else:
 			msg = 'theme and theme_entries is set to None.'
 		exit_log.info(msg)
+		return
+
+	def send_to_dbus(self, dbus_msg):
+		exit_log.info("Executing action " + dbus_msg)
+		if dbus_msg == 'Logout':
+			self.exit_bus.logout()
+		else:
+			self.exit_bus.send_dbus(dbus_msg)
 		return
