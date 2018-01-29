@@ -40,8 +40,8 @@ author = BunsenLabs
 window_width_adjustment = 0.50
 # Overall height of the dialog.
 dialog_height = 88
-button_height = 80
-inner_border = 24
+button_height = 84
+inner_border = 4
 # Delay for the fade in counter
 sleep_delay = 0.003
 #OverallOpacity of the dialog (0-100)
@@ -66,6 +66,9 @@ button_background_prelight = #678B8B
 # Text Colors
 text_color_normal = #00ffff
 text_color_prelight = #000000
+# Tooltip background
+tooltip_background = #284F63
+tooltip_foreground = #00ffff
 # Border Color
 border_color = #000040
 

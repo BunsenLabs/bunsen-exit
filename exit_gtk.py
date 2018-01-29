@@ -17,7 +17,7 @@ class ExitGtk:
 	#get a DBusInterface instance, so we can send message out.
 	exit_bus = dbus_interface.DbusInterface()
 
-	def _key_press_event(self, widget, event):
+	def key_press_event(self, widget, event):
 		keyval = event.keyval
 		keyval_name = gtk.gdk.keyval_name(keyval)
 		state = event.state
@@ -55,6 +55,65 @@ class ExitGtk:
 
 	def __init__(self, button_values, exit_bus, theme, theme_entries, style_path):
 		# Attributes
+		if theme == "default":
+			# There is no config file to be found at all, so create a default
+			# gtk window using button_values that shows buttons with labels
+			# using the default gtk theme.
+			# This will allow me to set some sane defaults for theme entries
+			# later on without messing with the appearance of the most basic
+			# default settings.
+			self.create_default_window(button_values)
+		else:
+			self.create_custom_window(button_values, exit_bus, theme, theme_entries, style_path)
+		self.window.show_all()
+		return
+
+	def create_default_window(self, button_values):
+		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		self.window.set_name("Bunsen Exit")
+		self.window.set_decorated(False)
+		self.window.connect("delete_event", self.destroy)
+		self.window.connect("destroy_event", self.destroy)
+		self.window.connect("key-press-event", self.key_press_event)
+		self.window.set_resizable(False)
+		self.window.set_keep_above(True)
+		self.window.stick()
+		self.window.set_position(gtk.WIN_POS_CENTER)
+		window_icon = self.window.render_icon(gtk.STOCK_QUIT, gtk.ICON_SIZE_DIALOG)
+		self.window.set_icon(window_icon)
+		self.button_box = gtk.HButtonBox()
+		self.button_box.set_layout(gtk.BUTTONBOX_SPREAD)
+		for key, value in button_values.iteritems():
+			# Format the keys into dbus actions
+			if key == 'cancel':
+				key = 'Cancel'
+			elif key == 'logout':
+				key = 'Logout'
+			elif key == 'suspend':
+				key = 'Suspend'
+			elif key == 'poweroff':
+				key = 'PowerOff'
+			elif key == 'reboot':
+				key = 'Reboot'
+			elif key == 'hibernate':
+				key = 'Hibernate'
+			elif key == 'hybridsleep':
+				key = 'HybridSleep'
+			# only add buttons that are to be shown
+			if value == 'show':
+				exit_log.info('Creating button for ' + key)
+				self.button = gtk.Button()
+				self.button.set_name(key)
+				self.button.set_relief(gtk.RELIEF_NONE)
+				self.button.set_label(key)
+				self.button.connect("clicked", self.clicked)
+				self.button_box.pack_start(self.button, True, True, 0)
+		self.window.add(self.button_box)
+		self.button_box.show()
+		self.button.show()
+		return
+
+	def create_custom_window(self, button_values, exit_bus, theme, theme_entries, style_path):
 		self.theme_entries = theme_entries
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		try:
@@ -78,6 +137,7 @@ class ExitGtk:
 			self.width_adjustment = float(self.theme_entries['window_width_adjustment'])
 		except:
 			exit_log.warn("window_width_adjustment not a float. Please check config. Defaulting to 0.5")
+			self.width_adjustment = 0.5
 		if self.width_adjustment > 0:
 			self.dialog_width = int( screen_width * self.width_adjustment)
 		if self.dialog_width > screen_width:
@@ -88,14 +148,17 @@ class ExitGtk:
 		self.window.set_decorated(False)
 		self.window.connect("delete_event", self.destroy)
 		self.window.connect("destroy_event", self.destroy)
-		self.window.connect("key-press-event", self._key_press_event)
+		self.window.connect("key-press-event", self.key_press_event)
 		self.window.set_resizable(False)
 		self.window.set_keep_above(True)
 		self.window.stick()
 		self.window.set_position(gtk.WIN_POS_CENTER)
 		windowicon = self.window.render_icon(gtk.STOCK_QUIT, gtk.ICON_SIZE_DIALOG)
 		self.window.set_icon(windowicon)
-		self.window.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['window_background_normal']))
+		try:
+			self.window.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['window_background_normal']))
+		except:
+			exit_log.debug("Could not parse theme entry window_background_normal. Background will not be changed.")
 		self.button_box = gtk.HButtonBox()
 		self.button_box.set_layout(gtk.BUTTONBOX_SPREAD)
 		try:
@@ -134,13 +197,9 @@ class ExitGtk:
 			if value == 'show':
 				exit_log.info('Creating button for ' + key)
 				self.add_buttons(key, self.theme_entries, self.button_box, num_buttons, self.dialog_width)
-				gobject.type_register(ColoredImageButton)
-		try:
 			self.window.set_size_request(self.dialog_width, int(self.dialog_height))
-		except:
-			exit_log.warn("Cannot set window to the size requested.")
-		self.window.add(self.button_box)
-		self.window.set_opacity(0)
+			self.window.add(self.button_box)
+			self.window.set_opacity(0)
 		self.window.show_all()
 		try:
 			self.overall_opacity = int(self.theme_entries['overall_opacity'])
@@ -151,21 +210,23 @@ class ExitGtk:
 			self.sleep_delay = float(self.theme_entries['sleep_delay'])
 		except:
 			exit_log.warn("Problem with sleep_delay. Please check your config. Expected a float.")
+			self.sleep_delay = 0.3
 		for i in range(1, self.overall_opacity):
 			sleep(self.sleep_delay)
 			while gtk.events_pending():
 				gtk.main_iteration(False)
 				self.window.set_opacity(float(i)/100.0)
-		self.window.show_all()
-		return
 
-	def main(self, button_visibility, style, theme, theme_entries):
+	def main(self):
 		gtk.main()
 
 
 	def query_tooltip_custom_cb(self, widget, x, y, keyboard_tip, tooltip, key, tooltip_label, tooltip_window):
-		fg_color = self.theme_entries['text_color_normal']
-		label_markup = '<span foreground="' + fg_color + '">' + key + '</span>'
+		try:
+			fg_color = self.theme_entries['tooltip_foreground']
+			label_markup = '<span foreground="' + fg_color + '">' + key + '</span>'
+		except:
+			label_markup = key
 		tooltip_label.set_markup(label_markup)
 		tooltip_label.show()
 		return True
@@ -188,13 +249,17 @@ class ExitGtk:
 			self.color_button.set_name(key)
 			self.color_button.set_relief(gtk.RELIEF_NONE)
 			self.color_button.set_label(key)
-			button_box.pack_start(self.button, True, True, 0)
+			self.color_button.connect("clicked", self.clicked)
+			button_box.pack_start(self.color_button, True, True, 0)
 		# Add custom tooltips
 		tooltip_window = gtk.Window(gtk.WINDOW_POPUP)
 		tooltip_label = gtk.Label()
 		tooltip_label.set_use_markup(True)
-		bg_color = gtk.gdk.color_parse(self.theme_entries['window_background_normal'])
-		tooltip_window.modify_bg(gtk.STATE_NORMAL, bg_color)
+		try:
+			bg_color = gtk.gdk.color_parse(self.theme_entries['tooltip_background'])
+			tooltip_window.modify_bg(gtk.STATE_NORMAL, bg_color)
+		except:
+			exit_log.debug("Could not parse theme entry tooltip_background. Leaving as default")
 		self.color_button.connect("query-tooltip", self.query_tooltip_custom_cb, key, tooltip_label, tooltip_window)
 		self.color_button.set_tooltip_window(tooltip_window)
 		tooltip_window.add(tooltip_label)
@@ -211,6 +276,13 @@ class ExitGtk:
 		else:
 			msg = 'theme and theme_entries is set to None.'
 		exit_log.info(msg)
+		return
+
+	def clicked(self, widget, data=None):
+		if widget.name == 'Cancel':
+			self.destroy()
+		else:
+			self.send_to_dbus(widget.name)
 		return
 
 	def send_to_dbus(self, dbus_msg):

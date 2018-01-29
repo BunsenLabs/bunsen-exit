@@ -152,7 +152,8 @@ def main():
 			style_path = bl_exit_config.get_style_path(style)
 			# Start to create the gtk interface
 			bl_exit_gtk = exit_gtk.ExitGtk(button_values, exit_bus, theme, theme_entries, style_path)
-			bl_exit_gtk.main(button_values, style, theme, theme_entries)
+			# Pass control over to bl_exit_gtk.
+			bl_exit_gtk.main()
 	return
 
 

@@ -60,7 +60,7 @@ class ColoredImageButton(gtk.EventBox):
 		self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
 		self.add_events(gtk.gdk.ENTER_NOTIFY_MASK)
 		self.add_events(gtk.gdk.LEAVE_NOTIFY_MASK)
-
+		self.add_events(gtk.gdk.KEY_PRESS)
 		#activate focus
 		self.set_can_focus(True)
 		# create the label
@@ -83,6 +83,17 @@ class ColoredImageButton(gtk.EventBox):
 		self.connect("leave-notify-event", self.mouse_out)
 		self.connect("focus-in-event", self.focus_in)
 		self.connect("focus-out-event", self.focus_out)
+		self.connect("key-press-event", self.key_pressed)
+
+	def key_pressed(self, widget, event, data=None):
+		keyval = event.keyval
+		keyval_name = gtk.gdk.keyval_name(keyval)
+		if keyval_name == "Return":
+			if widget.name == 'Cancel':
+				self.destroy()
+			else:
+				self.send_to_dbus(widget.name)
+		return
 
 	def clicked(self, widget, data=None):
 		if widget.name == 'Cancel':

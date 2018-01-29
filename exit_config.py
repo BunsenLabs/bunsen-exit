@@ -89,8 +89,9 @@ class Config(object):
 		else:
 			exit_log.warn("No config file found. Using defaults.")
 			button_values = {'Cancel':'show', 'Logout':'show', 'Suspend':'show',
-									'Hibernate':'show', 'Hybridsleep':'show',
+									'Hibernate':'hide', 'Hybridsleep':'hide',
 									'Reboot':'show', 'Poweroff':'show'}
+			theme = "default"
 		sorted_buttons = collections.OrderedDict(sorted(button_values.items()))
 		return sorted_buttons, style, theme, theme_entries
 
