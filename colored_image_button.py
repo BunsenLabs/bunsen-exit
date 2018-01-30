@@ -8,11 +8,10 @@ exit_log = logging.getLogger('Bunsen-Exit-Log')
 class ColoredImageButton(gtk.EventBox):
 	'''
 	This class implements a ColoredButton. The objective here is to
-	implement a button class that will image a button (if availale)
+	implement a button class that will image a button (if available)
 	or create a label on one, then 
 	'''
-
-	def __init__(self, key, button_image, theme_entries, num_buttons, dialog_width):
+	def __init__(self, key, button_image, theme_entries, num_buttons, dialog_width, show_labels, button_height):
 		'''
 		widget must be a gtk.Label
 		this is not checked in this simple version
@@ -21,6 +20,8 @@ class ColoredImageButton(gtk.EventBox):
 		self.button_image = button_image
 		self.theme_entries = theme_entries
 		self.attr = pango.AttrList()
+		self.show_labels = show_labels
+		self.button_height = button_height
 		# Maps button keys to accelerators.
 		if self.key == "Cancel":
 			self.accel = "Cancel"
@@ -36,12 +37,6 @@ class ColoredImageButton(gtk.EventBox):
 			self.accel = "_HybridSleep"
 		elif self.key == "Reboot":
 			self.accel = "Re_boot"
-		print self.accel
-		try:
-			self.button_height = int(self.theme_entries['button_height'])
-		except:
-			exit_log.warn('Unable to parse button_height. Setting to 60')
-			self.button_height = 60
 		try:
 			self.button_spacing = int(self.theme_entries['button_spacing'])
 		except:
@@ -63,12 +58,15 @@ class ColoredImageButton(gtk.EventBox):
 		self.add_events(gtk.gdk.KEY_PRESS)
 		#activate focus
 		self.set_can_focus(True)
-		# create the label
-		self.label = gtk.Label()
-		self.label.modify_font(pango.FontDescription("FreeSans 12"))
-		self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
-		self.label.set_use_underline(True)
-		self.label.set_text_with_mnemonic(self.accel)
+		if self.show_labels:
+			# create the label
+			self.label = gtk.Label()
+			self.label.modify_font(pango.FontDescription("FreeSans 12"))
+			self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
+			self.label.set_use_underline(True)
+			self.label.set_text_with_mnemonic(self.accel)
+		else:
+			self.label = None
 		#colorize the button upon init
 		self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_normal']))
 		# Add the image_label box
@@ -104,29 +102,33 @@ class ColoredImageButton(gtk.EventBox):
 
 	def focus_in(self, widget, event):
 		self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_prelight']))
-		self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_prelight']))
-		self.label.set_text_with_mnemonic(self.accel)
+		if self.show_labels:
+			self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_prelight']))
+			self.label.set_text_with_mnemonic(self.accel)
 		self.show_all()
 		return
 
 	def focus_out(self, widget, event):
 		self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_normal']))
-		self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
-		self.label.set_text_with_mnemonic(self.accel)
+		if self.show_labels:
+			self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
+			self.label.set_text_with_mnemonic(self.accel)
 		self.show_all()
 
 	def mouse_in(self, widget, event):
 		self.grab_focus()
 		self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_prelight']))
-		self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_prelight']))
-		self.label.set_text_with_mnemonic(self.accel)
+		if self.show_labels:
+			self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_prelight']))
+			self.label.set_text_with_mnemonic(self.accel)
 		self.show_all()
 		return
 
 	def mouse_out(self, widget, event):
 		self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_normal']))
-		self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
-		self.label.set_text_with_mnemonic(self.accel)
+		if self.show_labels:
+			self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
+			self.label.set_text_with_mnemonic(self.accel)
 		self.show_all()
 
 	def destroy(self, widget=None, event=None, data=None):
@@ -141,7 +143,8 @@ class ColoredImageButton(gtk.EventBox):
 		except IOError:
 			exit_log.warn("Unable to set button image.")
 		box.pack_start(image, False, False, 0)
-		box.pack_start(label, False, False, 0)
+		if self.label:
+			box.pack_start(label, False, False, 0)
 		return box
 
 	def send_to_dbus(self, dbus_msg):

@@ -22,6 +22,7 @@ class ExitGtk:
 		keyval_name = gtk.gdk.keyval_name(keyval)
 		state = event.state
 		alt = (state & gtk.gdk.MOD1_MASK)
+		print(keyval_name)
 		# Cancel shortcut
 		if alt and keyval_name == 'l':
 			self.send_to_dbus('Logout')
@@ -43,18 +44,42 @@ class ExitGtk:
 		# Cancel Shortcut
 		elif keyval_name == 'Escape':
 			self.destroy()
-		elif keyval_name == 'Alt':
-			self.show_button_labels()
+		elif keyval_name == 'Shift_L':
+			self.show_labels = not self.show_labels
+			if self.show_labels:
+				self.window.destroy()
+				self.dialog_height = self.dialog_height + 20
+				self.button_height = self.button_height + 20
+			else:
+				self.dialog_height = self.dialog_height - 20
+				self.button_height = self.button_height - 20
+				self.window.destroy()
+			self.create_custom_window()
 		else:
 			return False
 		return True
-		
+
 	def destroy(self, widget=None, event=None, data=None):
 		self.window.hide_all()
 		gtk.main_quit()
 
-	def __init__(self, button_values, exit_bus, theme, theme_entries, style_path):
+	def __init__(self, button_values, exit_bus, theme, theme_entries):
 		# Attributes
+		self.show_labels = False
+		self.button_values = button_values
+		self.exit_bus = exit_bus
+		self.theme = theme
+		self.theme_entries= theme_entries
+		try:
+			self.dialog_height = int(self.theme_entries['dialog_height'])
+		except:
+			exit_log.warn("dialog_height not set or not an int. Setting a default of 64 pixels.")
+			self.dialog_height = 64
+		try:
+			self.button_height = int(self.theme_entries['button_height'])
+		except:
+			exit_log.warn("button height not set or not an int. Setting a default of 60 pixels.")
+			self.button_height = 60
 		if theme == "default":
 			# There is no config file to be found at all, so create a default
 			# gtk window using button_values that shows buttons with labels
@@ -62,13 +87,13 @@ class ExitGtk:
 			# This will allow me to set some sane defaults for theme entries
 			# later on without messing with the appearance of the most basic
 			# default settings.
-			self.create_default_window(button_values)
+			self.create_default_window()
 		else:
-			self.create_custom_window(button_values, exit_bus, theme, theme_entries, style_path)
+			self.create_custom_window()
 		self.window.show_all()
 		return
 
-	def create_default_window(self, button_values):
+	def create_default_window(self):
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.window.set_name("Bunsen Exit")
 		self.window.set_decorated(False)
@@ -83,7 +108,7 @@ class ExitGtk:
 		self.window.set_icon(window_icon)
 		self.button_box = gtk.HButtonBox()
 		self.button_box.set_layout(gtk.BUTTONBOX_SPREAD)
-		for key, value in button_values.iteritems():
+		for key, value in self.button_values.iteritems():
 			# Format the keys into dbus actions
 			if key == 'cancel':
 				key = 'Cancel'
@@ -113,14 +138,8 @@ class ExitGtk:
 		self.button.show()
 		return
 
-	def create_custom_window(self, button_values, exit_bus, theme, theme_entries, style_path):
-		self.theme_entries = theme_entries
+	def create_custom_window(self):
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		try:
-			self.dialog_height = int(self.theme_entries['dialog_height'])
-		except:
-			exit_log.warn("dialog_height not set. Settins a default of 64 pixels.")
-			self.dialog_height = 64
 		# Get the screen width under the cursor
 		screen_width = 800 # fallback width
 		try:
@@ -173,11 +192,11 @@ class ExitGtk:
 			exit_log.warn("button_spacing is not set or is not an int. Please check your configuration. Expected an int.")
 		# Get a count of the nuber of buttons to be shown
 		num_buttons = 0
-		for key, value in button_values.iteritems():
+		for key, value in self.button_values.iteritems():
 			if value == "show":
 				num_buttons += 1
 		# Now build the array of buttons
-		for key, value in button_values.iteritems():
+		for key, value in self.button_values.iteritems():
 			# Format the keys into dbus actions
 			if key == 'cancel':
 				key = 'Cancel'
@@ -196,7 +215,8 @@ class ExitGtk:
 			# only add buttons that are to be shown
 			if value == 'show':
 				exit_log.info('Creating button for ' + key)
-				self.add_buttons(key, self.theme_entries, self.button_box, num_buttons, self.dialog_width)
+				
+				self.add_buttons(key, self.theme_entries, self.button_box, num_buttons, self.dialog_width, self.show_labels, self.button_height)
 			self.window.set_size_request(self.dialog_width, int(self.dialog_height))
 			self.window.add(self.button_box)
 			self.window.set_opacity(0)
@@ -231,7 +251,7 @@ class ExitGtk:
 		tooltip_label.show()
 		return True
 
-	def add_buttons(self, key, theme_entries, button_box, num_buttons, dialog_width):
+	def add_buttons(self, key, theme_entries, button_box, num_buttons, dialog_width, show_labels, button_height):
 		# iconpath refers to a theme_entry in bl-exitrc.
 		# It needs to refer to  a valid path. Checks for path exists
 		# and points to an image need to be added. 
@@ -240,7 +260,7 @@ class ExitGtk:
 			image_key = 'buttonimage' + key.lower()
 			button_image = icon_path + "/" + self.theme_entries[ image_key ]
 			exit_log.debug("Loading theme entry " + key + " from " + button_image)
-			self.color_button = ColoredImageButton(key, button_image, self.theme_entries, num_buttons, dialog_width)
+			self.color_button = ColoredImageButton(key, button_image, self.theme_entries, num_buttons, dialog_width, self.show_labels, self.button_height)
 			self.color_button.set_name(key)
 			button_box.pack_start(self.color_button, True, True, 0)
 		else:
