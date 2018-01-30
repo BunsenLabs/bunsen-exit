@@ -53,20 +53,19 @@ def get_options():
 	return args
 
 
-def log_config(button_visibility, style, theme, theme_entries):
+def log_config(button_values, theme, theme_entries):
 	exit_log.debug('--------------------------------------')
 	exit_log.debug('Button Values')
 	exit_log.debug('--------------------------------------')
-	for key in button_visibility:
-		exit_log.debug(key + '\t' + button_visibility[ key ])
+	for key in button_values:
+		exit_log.debug(key + '\t' + button_values[ key ])
 	exit_log.debug('\n')
 	exit_log.debug('--------------------------------------')
-	exit_log.debug('Style')
+	exit_log.debug('Theme')
 	exit_log.debug('--------------------------------------')
-	for key in style:
-		exit_log.debug(key + ' = ' + style[ key ])
+	for key in theme:
+		exit_log.debug(key + ' = ' + theme[ key ])
 	exit_log.debug('\n')
-	exit_log.debug('Theme is set to ' + theme + '\n')
 	exit_log.debug('--------------------------------------')
 	exit_log.debug('Theme Entries')
 	exit_log.debug('--------------------------------------')
@@ -139,17 +138,19 @@ def main():
 				msg = "No configuration file found. Using default gtk theme."
 				exit_log.warn(msg)
 
-		button_values, style, theme, theme_entries = bl_exit_config.read_config(config_path)
-		if LOGGING:
-			try:
-				log_config(button_values, style, theme, theme_entries)
-			except TypeError:
-				exit_log.warn("No config information found to log. Moving on.")
+		button_values, theme = bl_exit_config.read_config(config_path)
 		if not DISPLAY:
 			exit_log.debug('No valid xserver found. Please use a command line option')
 			sys.exit(1)
 		else:
-			style_path = bl_exit_config.get_style_path(style)
+			theme_path = bl_exit_config.get_theme_path(theme)
+			theme_entries = bl_exit_config.read_theme(theme_path)
+			log_config(button_values, theme, theme_entries)
+		if LOGGING:
+			try:
+				log_config(theme_entries)
+			except TypeError:
+				exit
 			# Start to create the gtk interface
 			bl_exit_gtk = exit_gtk.ExitGtk(button_values, exit_bus, theme, theme_entries)
 			# Pass control over to bl_exit_gtk.

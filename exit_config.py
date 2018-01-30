@@ -42,24 +42,24 @@ class Config(object):
 		exit_log.warn(msg)
 		return
 
-	def get_style_path(self, style):
-		fname = ""
-		style_dir = BaseDirectory.save_config_path('bunsen-exit')
-		try:
-			fname = style[ 'rcfile' ]
-		except KeyError:
-				exit_log.warn("Style not found. Running with defaults.")
-		style_path = style_dir + '/styles/' + fname
-		msg = 'Style path is set to ' + style_path
-		exit_log.info(msg)
-		return style_path
+	def get_theme_path(self, theme):
+		if not theme['name'] == "default":
+			fname = ""
+			theme_dir = BaseDirectory.save_config_path('bunsen-exit')
+			try:
+				fname = theme[ 'rcfile' ]
+			except KeyError:
+				exit_log.warn("Theme not found. Running with defaults.")
+			theme_path = theme_dir + '/themes/' + fname
+			msg = 'Theme path is set to ' + theme_path
+			exit_log.info(msg)
+			return theme_path
 
 	def read_config(self, config_path):
+		specified_theme = {}
 		theme = {}
-		theme_entries = {}
 		button_values = {}
 		button_visibility = []
-		style = {}
 		config_file = ConfigParser.RawConfigParser()
 		if config_path:
 			exit_log.info('Attempting to parse ' + config_path)
@@ -73,25 +73,47 @@ class Config(object):
 					key = item[ 0 ]
 					val = item[ 1 ]
 					button_values[ key ] = val
-			style_entries = config_file.items('style')
-			for item in style_entries:
+			specified_theme = config_file.items('theme')
+			for item in specified_theme:
 				for x in range(0, len(item)):
 					key = item[ 0 ]
 					val = item[ 1 ]
-					style[ key ] = val
-			theme = config_file.get('theme', 'theme')
-			theme_list = config_file.items(theme)
-			for item in theme_list:
-				for x in range(0, len(item)):
-					key = item[ 0 ]
-					val = item[ 1 ]
-					theme_entries[ key ] = val
+					theme[ key ] = val
+			#theme_list = config_file.items(theme)
+			#for item in theme_list:
+			#	for x in range(0, len(item)):
+			#		key = item[ 0 ]
+			#		val = item[ 1 ]
+			#		theme_entries[ key ] = val
 		else:
 			exit_log.warn("No config file found. Using defaults.")
 			button_values = {'Cancel':'show', 'Logout':'show', 'Suspend':'show',
 									'Hibernate':'hide', 'Hybridsleep':'hide',
 									'Reboot':'show', 'Poweroff':'show'}
-			theme = "default"
+			theme['name'] = "default"
 		sorted_buttons = collections.OrderedDict(sorted(button_values.items()))
-		return sorted_buttons, style, theme, theme_entries
+		return sorted_buttons, theme
 
+	def read_theme(self, theme_path):
+		theme_entries = {}
+		theme = {}
+		theme_file = ConfigParser.RawConfigParser()
+		if theme_path:
+			exit_log.info("Attempting to parse " + theme_path)
+			theme_file.read(theme_path)
+			try:
+				theme = theme_file.items('theme')
+			except ConfigParser.NoSectionError as err:
+				exit_log.warn(err)
+			for item in theme:
+				for x in range(0, len(item)):
+					key = item[0]
+					val = item[1]
+					theme_entries[key] = val
+		sorted_themes = collections.OrderedDict(sorted(theme_entries.items()))
+		return sorted_themes
+
+	def validate_theme_entries(self, theme, theme_entries):
+		# Ensure that all theme_entries conform to some sort of sensible defaults
+		
+		return

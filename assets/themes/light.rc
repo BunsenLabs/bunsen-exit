@@ -1,0 +1,23 @@
+[light]
+name=Light Theme
+author=BunsenLabs
+#Overall height of the dialog.
+dialogHeight=150
+#Delay for the fade in counter
+sleepDelay=0.003
+#OverallOpacity of the dialog (0-100)
+overallOpacity=100
+#Space between Buttons
+buttonSpacing=5
+# path to icon files
+iconpath=/usr/share/images/bunsen/exit/light
+#Button textures (i.e. the images on them)
+buttonImageCancel=cancel.png
+buttonImagePoweroff=poweroff.png
+buttonImageReboot=reboot.png
+buttonImageSuspend=sleep.png
+buttonImageLogout=logout.png
+buttonImageHybridSleep=hibernate.png
+buttonImageHibernate=hibernate.png
+# windowWidthAdjustment - scale factor for window width ( 0 = default, 800px; 1 = full screen width)
+windowWidthAdjustment=1

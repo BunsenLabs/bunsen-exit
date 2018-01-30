@@ -22,7 +22,6 @@ class ExitGtk:
 		keyval_name = gtk.gdk.keyval_name(keyval)
 		state = event.state
 		alt = (state & gtk.gdk.MOD1_MASK)
-		print(keyval_name)
 		# Cancel shortcut
 		if alt and keyval_name == 'l':
 			self.send_to_dbus('Logout')
