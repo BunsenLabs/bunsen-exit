@@ -46,14 +46,19 @@ class ExitGtk:
 		elif keyval_name == 'Shift_L':
 			self.show_labels = not self.show_labels
 			if self.show_labels:
-				self.window.destroy()
 				self.dialog_height = self.dialog_height + 20
 				self.button_height = self.button_height + 20
+				self.button_box.destroy()
+				self.window.set_size_request(self.dialog_width, int(self.dialog_height))
 			else:
 				self.dialog_height = self.dialog_height - 20
 				self.button_height = self.button_height - 20
-				self.window.destroy()
-			self.create_custom_window()
+				self.button_box.destroy()
+				self.window.set_size_request(self.dialog_width, int(self.dialog_height))
+			self.create_button_box()
+			self.create_buttons_from_list()
+			self.window.add(self.button_box)
+			self.window.show_all()
 		else:
 			return False
 		return True
@@ -177,6 +182,33 @@ class ExitGtk:
 			self.window.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['window_background_normal']))
 		except:
 			exit_log.debug("Could not parse theme entry window_background_normal. Background will not be changed.")
+		self.create_button_box()
+		# Get a count of the nuber of buttons to be shown
+		self.create_buttons_from_list()
+		self.window.set_size_request(self.dialog_width, int(self.dialog_height))
+		self.window.add(self.button_box)
+		self.window.set_opacity(0)
+		self.window.show_all()
+		try:
+			self.overall_opacity = int(self.theme_entries['overall_opacity'])
+		except:
+			exit_log.warn("Problem with overall_opacity. Please check your config. Expected an int.")
+			self.overall_opacity = 100
+		try:
+			self.sleep_delay = float(self.theme_entries['sleep_delay'])
+		except:
+			exit_log.warn("Problem with sleep_delay. Please check your config. Expected a float.")
+			self.sleep_delay = 0.3
+		for i in range(1, self.overall_opacity):
+			sleep(self.sleep_delay)
+			while gtk.events_pending():
+				gtk.main_iteration(False)
+				self.window.set_opacity(float(i)/100.0)
+
+	def main(self):
+		gtk.main()
+
+	def create_button_box(self):
 		self.button_box = gtk.HButtonBox()
 		self.button_box.set_layout(gtk.BUTTONBOX_SPREAD)
 		try:
@@ -189,7 +221,9 @@ class ExitGtk:
 			self.button_box.set_spacing(int(self.theme_entries['button_spacing']))
 		except:
 			exit_log.warn("button_spacing is not set or is not an int. Please check your configuration. Expected an int.")
-		# Get a count of the nuber of buttons to be shown
+		return
+
+	def create_buttons_from_list(self):
 		num_buttons = 0
 		for key, value in self.button_values.iteritems():
 			if value == "show":
@@ -213,32 +247,9 @@ class ExitGtk:
 				key = 'HybridSleep'
 			# only add buttons that are to be shown
 			if value == 'show':
-				exit_log.info('Creating button for ' + key)
-				
-				self.add_buttons(key, self.theme_entries, self.button_box, num_buttons, self.dialog_width, self.show_labels, self.button_height)
-			self.window.set_size_request(self.dialog_width, int(self.dialog_height))
-			self.window.add(self.button_box)
-			self.window.set_opacity(0)
-		self.window.show_all()
-		try:
-			self.overall_opacity = int(self.theme_entries['overall_opacity'])
-		except:
-			exit_log.warn("Problem with overall_opacity. Please check your config. Expected an int.")
-			self.overall_opacity = 100
-		try:
-			self.sleep_delay = float(self.theme_entries['sleep_delay'])
-		except:
-			exit_log.warn("Problem with sleep_delay. Please check your config. Expected a float.")
-			self.sleep_delay = 0.3
-		for i in range(1, self.overall_opacity):
-			sleep(self.sleep_delay)
-			while gtk.events_pending():
-				gtk.main_iteration(False)
-				self.window.set_opacity(float(i)/100.0)
-
-	def main(self):
-		gtk.main()
-
+				exit_log.debug('Creating button for ' + key)
+				self.add_buttons(key, num_buttons)
+		return
 
 	def query_tooltip_custom_cb(self, widget, x, y, keyboard_tip, tooltip, key, tooltip_label, tooltip_window):
 		try:
@@ -250,7 +261,7 @@ class ExitGtk:
 		tooltip_label.show()
 		return True
 
-	def add_buttons(self, key, theme_entries, button_box, num_buttons, dialog_width, show_labels, button_height):
+	def add_buttons(self, key, num_buttons):
 		# iconpath refers to a theme_entry in bl-exitrc.
 		# It needs to refer to  a valid path. Checks for path exists
 		# and points to an image need to be added. 
@@ -259,9 +270,9 @@ class ExitGtk:
 			image_key = 'buttonimage' + key.lower()
 			button_image = icon_path + "/" + self.theme_entries[ image_key ]
 			exit_log.debug("Loading theme entry " + key + " from " + button_image)
-			self.color_button = ColoredImageButton(key, button_image, self.theme_entries, num_buttons, dialog_width, self.show_labels, self.button_height)
+			self.color_button = ColoredImageButton(key, button_image, self.theme_entries, num_buttons, self.dialog_width, self.show_labels, self.button_height)
 			self.color_button.set_name(key)
-			button_box.pack_start(self.color_button, True, True, 0)
+			self.button_box.pack_start(self.color_button, True, True, 0)
 		else:
 			exit_log.warn("Icon path not found. Defaulting to button labels.")
 			self.color_button = gtk.Button()
@@ -283,7 +294,7 @@ class ExitGtk:
 		self.color_button.set_tooltip_window(tooltip_window)
 		tooltip_window.add(tooltip_label)
 		# Show the custom button
-		button_box.show()
+		self.button_box.show()
 		self.color_button.show()
 		return
 
