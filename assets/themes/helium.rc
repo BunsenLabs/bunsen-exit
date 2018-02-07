@@ -1,18 +1,19 @@
 
 # Helium Theme for the bunsen-exit dialog.
 # -*- coding: utf-8 -*-
-#
+#    This is a fork of:
 #    bl-exit: Bunsenlabs exit dialog, offering various exit options
 #     via both GUI and CLI
 #    Copyright (C) 2012 Philip Newborough  <corenominal@corenominal.org>
 #    Copyright (C) 2016 xaos52  <xaos52@gmail.com>
 #    Copyright (C) 2017 damo  <damo@bunsenlabs.org>
-#
+#    Copyright (C) 2018 William Bradley  <webradley9929@gmail.com>
+
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
-#
+
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -68,7 +69,7 @@
 # button_spacing - the spacing between the buttons.
 # defaults to 0
 
-# iconpath - thwe path to the images you want to map to the buttons.
+# iconpath - the path to the images you want to map to the buttons.
 # If this path cannot be found, then the dialog will fall back to a default 
 # gtk dialog. 
 
