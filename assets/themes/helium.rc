@@ -1,21 +1,147 @@
+
+# Helium Theme for the bunsen-exit dialog.
+# -*- coding: utf-8 -*-
+#
+#    bl-exit: Bunsenlabs exit dialog, offering various exit options
+#     via both GUI and CLI
+#    Copyright (C) 2012 Philip Newborough  <corenominal@corenominal.org>
+#    Copyright (C) 2016 xaos52  <xaos52@gmail.com>
+#    Copyright (C) 2017 damo  <damo@bunsenlabs.org>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+# NOTE: All defaults are taken from the theme bunsen-small from the original 
+# bl-exitrc. This is the previous set of defaults used in Bunsenlabs Hydrogen.
+
+# NOTE: In order to achieve the original Crunchbang look, ensure that you have
+# a gtk theme similar to that of #! set as your default, then remove or rename
+# the config file, located at: ~/.config/bunsen-exit/bl-exitrc
+
+#[theme] is mandatory
+
+# name - the name of the theme.
+# defaults to Unknown
+
+# author - the author of the theme.
+# defaults to Unknown
+
+# window_width adjustment - Percentage of the scree the dialog window should occupy.
+# defaults to 0.50
+
+# scale factor for window_width_adjustment ( 0 = default, 800px; 1 = full screen)
+
+# dialog_height - the height of the dialog window.
+# defaults to 130
+
+# button_height - the height of the custom buttons. 
+# What appears to be a button is an event container packed with an image and
+# a label. This key determines the overall height of that container.
+# This allows the image and the label to be treated as one unit for 
+# mouse and keyboard events. When you hover over the widget, the size of that
+# This defaults to 130 in order to mimic earlier variants of this application.
+# NOTE: values of less than 60 tend to create clipping on the labels.
+# Similarly, values larger than the dialog_height will create clipping.
+
+# inner_border - this specifies the size of the Horizontal container that the
+# buttons get packed into. It is useful to create a thin inner border between
+# the dialog and that container. Large values may create clipping. 
+# Defaults to 0.
+
+# sleep_delay - delay for the fade in counter.
+# This allows the dialog to fade into view.
+# defaults to 0.001
+
+# overall_opacity - opacity of the dialog from (0 - 100) with 0 being transparent.
+# defaults to 80
+
+# button_spacing - the spacing between the buttons.
+# defaults to 0
+
+# iconpath - thwe path to the images you want to map to the buttons.
+# If this path cannot be found, then the dialog will fall back to a default 
+# gtk dialog. 
+
+# Button textures (i.e. the images on them)
+# Map file names to button types similar to below.
+# TODO: Ensure missing filenames fallback somehow (possibly stock icons?)
+# TODO: Refactor these and eliminate the camel case 
+# buttonImageCancel = cancel-sm.png
+# buttonImagePoweroff = poweroff-sm.png
+# buttonImageReboot = reboot-sm.png
+# buttonImageSuspend = sleep-sm.png
+# buttonImageLogout = logout-sm.png
+# buttonImageHybridSleep = hibernate-sm.png
+# buttonImageHibernate = hibernate-sm.png
+
+# window_background_normal - the color of the dialog window
+# Must use hexadecimal color format
+# Will regex validate
+# defaults to #838383
+
+# button_background_normal - the normal color of the button
+# Must use hexadecimal format
+# Will regex validate
+# defaults to #838383
+
+# button_background_prelight - the highlighted color of the button.
+# Must use hexadecimal format
+# Will regex validate
+# defaults to #c1c1c1
+
+# text_color_normal - the normal text color for labels.
+# Must use hexadecimal format
+# Will regex validate
+# defaults to #d9d9d9
+
+# text_color_prelight - the highlighted text color of labels.
+# Must use hexadecimal format.
+# Will regex validate
+# defaults to #d9d9d9
+
+# tooltip_background - the color of tooltip backgrounds
+# Must use hexadecimal format
+# Will regex validate
+# defaults to #c1c1c1
+
+# tooltip_foreground - the tooltip text color
+# Must use hexadecimal format
+# Will regex validate
+# Defaults to #000000
+
+# border_color - Not implemented yet.
+# font_name - Not implemented yet.
+# font_size - Not implemented yet.
+
 [theme]
+
+# Metadata
 name = Helium Beam Theme
 author = BunsenLabs
-# window_width_adjustment - scale factor for window width ( 0 = default, 800px; 1 = full screen width)
+
+# Dialog
 window_width_adjustment = 0.50
-# Overall height of the dialog.
-dialog_height = 68
-button_height = 64
+dialog_height = 66
+button_height = 62
 inner_border = 4
-# Delay for the fade in counter
+
+# Opacity
 sleep_delay = 0.003
-#OverallOpacity of the dialog (0-100)
 overall_opacity = 80
-#Space between Buttons
+
+# Buttons
 button_spacing = 4
-# path to icon files
 iconpath = /usr/share/images/bunsen/exit/light
-#Button textures (i.e. the images on them)
 buttonImageCancel = cancel-sm.png
 buttonImagePoweroff = poweroff-sm.png
 buttonImageReboot = reboot-sm.png
@@ -23,16 +149,26 @@ buttonImageSuspend = sleep-sm.png
 buttonImageLogout = logout-sm.png
 buttonImageHybridSleep = hibernate-sm.png
 buttonImageHibernate = hibernate-sm.png
-# Window Background
+
+# Window Colors
 window_background_normal = #284F63
-# Button Background Normal
+
+# Button Backgrounds
 button_background_normal = #284F63
 button_background_prelight = #678B8B
+
 # Text Colors
 text_color_normal = #00ffff
 text_color_prelight = #000000
-# Tooltip background
+
+# Tooltip Colors
 tooltip_background = #284F63
 tooltip_foreground = #00ffff
-# Border Color
-border_color = #000040
+
+# Border Color - TODO
+# border_color = #000040
+
+# Fonts
+# font_name - TODO
+# font_size - TODO
+
