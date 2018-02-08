@@ -141,7 +141,12 @@ class ColoredImageButton(gtk.EventBox):
 		try:
 			image.set_from_file(button_image)
 		except IOError:
-			exit_log.warn("Unable to set button image.")
+			exit_log.warn("Unable to set button image. Using stock icon.")
+			# Need to set a stock icon for the button image if image cannot be set.
+			stock_icon = "gtk.STOCK_DIALOG_ERROR"
+			image.set_from_stock(stock_icon, self.button_height)
+			exit_log.warn("Setting stock icon to " + stock_icon)
+			
 		box.pack_start(image, False, False, 0)
 		if self.label:
 			box.pack_start(label, False, False, 0)

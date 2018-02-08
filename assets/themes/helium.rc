@@ -77,13 +77,13 @@
 # Map file names to button types similar to below.
 # TODO: Ensure missing filenames fallback somehow (possibly stock icons?)
 # TODO: Refactor these and eliminate the camel case 
-# buttonImageCancel = cancel-sm.png
-# buttonImagePoweroff = poweroff-sm.png
-# buttonImageReboot = reboot-sm.png
-# buttonImageSuspend = sleep-sm.png
-# buttonImageLogout = logout-sm.png
-# buttonImageHybridSleep = hibernate-sm.png
-# buttonImageHibernate = hibernate-sm.png
+# button_image_cancel = cancel-sm.png
+# button_image_poweroff = poweroff-sm.png
+# button_image_reboot = reboot-sm.png
+# button_image_suspend = sleep-sm.png
+# button_image_logout = logout-sm.png
+# button_image_hybridsleep = hibernate-sm.png
+# button_image_hibernate = hibernate-sm.png
 
 # window_background_normal - the color of the dialog window
 # Must use hexadecimal color format
@@ -142,14 +142,14 @@ overall_opacity = 80
 
 # Buttons
 button_spacing = 4
-iconpath = /usr/share/images/bunsen/exit/light
-buttonImageCancel = cancel-sm.png
-buttonImagePoweroff = poweroff-sm.png
-buttonImageReboot = reboot-sm.png
-buttonImageSuspend = sleep-sm.png
-buttonImageLogout = logout-sm.png
-buttonImageHybridSleep = hibernate-sm.png
-buttonImageHibernate = hibernate-sm.png
+icon_path = /usr/share/images/bunsen/exit/light
+button_image_cancel = cancel-sm.png
+button_image_poweroff = poweroff-sm.png
+button_image_reboot = reboot-sm.png
+button_image_suspend = sleep-sm.png
+button_image_logout = logout-sm.png
+button_image_hybridsleep = hibernate-sm.png
+button_image_hibernate = hibernate-sm.png
 
 # Window Colors
 window_background_normal = #284F63

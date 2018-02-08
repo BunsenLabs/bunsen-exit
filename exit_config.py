@@ -237,5 +237,90 @@ class Config(object):
 			exit_log.warn("Setting button_spacing to 0")
 			theme_entries['button_spacing'] = 0
 		
+		# validate icon_path. If icon_path does not exist then this program
+		# should run with button labels instead of images.
+		try:
+			icon_path = theme_entries['icon_path']
+		except KeyError as err:
+			exit_log.warn("<key error>: icon_path is not found in config file.")
+			exit_log.warn("Setting icon_path to None.")
+			exit_log.warn("WARNING: running dialog without labels only.")
+			theme_entries['icon_path'] = None
+		if not theme_entries['icon_path'] == "" or theme_entries['icon_path'] == None:
+			try:
+				path = os.path_isdir(theme_entries['icon_path'])
+		except IOError as err:
+			exit_log.warn("path " + icon_path + " does not exist.")
+			theme_entries['icon_path'] = None
+		
+		# validate button_image_cancel
+		# if icon_path + / + button_image_cancel is empty or cannot be found
+		# default to building the buttons using gtk.STOCK_DIALOG_ERROR icon.
+		try:
+			image_path = theme_entries['icon_path'] + "/" + theme_entries['button_image_cancel']
+		except KeyError as err:
+			exit_log.warn("<key error>: button_image_cancel not found in config file.")
+			exit_log.warn("Building button with icon gtk.STOCK_DIALOG_ERROR")
+			theme_entries['button_image_cancel'] = gtk.STOCK_DIALOG_ERROR
+		
+		# validate button_image_poweroff
+		# if icon_path + / + button_image_poweroff is empty or cannot be found
+		# default to building the buttons using gtk.STOCK_DIALOG_ERROR icon.
+		try:
+			image_path = theme_entries['icon_path'] + "/" + theme_entries['button_image_poweroff']
+		except KeyError as err:
+			exit_log.warn("<key error>: button_image_poweroff not found in config file.")
+			exit_log.warn("Building button with icon gtk.STOCK_DIALOG_ERROR")
+			theme_entries['button_image_poweroff'] = gtk.STOCK_DIALOG_ERROR
+			
+		# validate button_image_reboot
+		# if icon_path + / + button_image_reboot is empty or cannot be found
+		# default to building the buttons using gtk.STOCK_DIALOG_ERROR icon.
+		try:
+			image_path = theme_entries['icon_path'] + "/" + theme_entries['button_image_reboot']
+		except KeyError as err:
+			exit_log.warn("<key error>: button_image_reboot not found in config file.")
+			exit_log.warn("Building button with icon gtk.STOCK_DIALOG_ERROR")
+			theme_entries['button_image_reboot'] = gtk.STOCK_DIALOG_ERROR
+		
+		# validate button_image_suspend
+		# if icon_path + / + button_image_suspend is empty or cannot be found
+		# default to building the buttons using gtk.STOCK_DIALOG_ERROR icon.
+		try:
+			image_path = theme_entries['icon_path'] + "/" + theme_entries['button_image_suspend']
+		except KeyError as err:
+			exit_log.warn("<key error>: button_image_suspend not found in config file.")
+			exit_log.warn("Building button with icon gtk.STOCK_DIALOG_ERROR")
+			theme_entries['button_image_suspend'] = gtk.STOCK_DIALOG_ERROR
+		
+		# validate button_image_logout
+		# if icon_path + / + button_image_logout is empty or cannot be found
+		# default to building the buttons using gtk.STOCK_DIALOG_ERROR icon.
+		try:
+			image_path = theme_entries['icon_path'] + "/" + theme_entries['button_image_logout']
+		except KeyError as err:
+			exit_log.warn("<key error>: button_image_logout not found in config file.")
+			exit_log.warn("Building button with icon gtk.STOCK_DIALOG_ERROR")
+			theme_entries['button_image_logout'] = gtk.STOCK_DIALOG_ERROR
+		
+		# validate button_image_hybridsleep
+		# if icon_path + / + button_image_hybridsleep is empty or cannot be found
+		# default to building the buttons using gtk.STOCK_DIALOG_ERROR icon.
+		try:
+			image_path = theme_entries['icon_path'] + "/" + theme_entries['button_image_hybridsleep']
+		except KeyError as err:
+			exit_log.warn("<key error>: button_image_hybridsleep not found in config file.")
+			exit_log.warn("Building button with icon gtk.STOCK_DIALOG_ERROR")
+			theme_entries['button_image_hybridsleep'] = gtk.STOCK_DIALOG_ERROR
+			
+		# validate button_image_hibernate
+		# if icon_path + / + button_image_hibernate is empty or cannot be found
+		# default to building the buttons using gtk.STOCK_DIALOG_ERROR icon.
+		try:
+			image_path = theme_entries['icon_path'] + "/" + theme_entries['button_image_hibernate']
+		except KeyError as err:
+			exit_log.warn("<key error>: button_image_hibernate not found in config file.")
+			exit_log.warn("Building button with icon gtk.STOCK_DIALOG_ERROR")
+			theme_entries['button_image_hibernate'] = gtk.STOCK_DIALOG_ERROR
 		
 		return

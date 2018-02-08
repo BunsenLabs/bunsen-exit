@@ -265,9 +265,9 @@ class ExitGtk:
 		# iconpath refers to a theme_entry in bl-exitrc.
 		# It needs to refer to  a valid path. Checks for path exists
 		# and points to an image need to be added. 
-		if 'iconpath' in self.theme_entries:
-			icon_path = self.theme_entries[ 'iconpath' ]
-			image_key = 'buttonimage' + key.lower()
+		if 'icon_path' in self.theme_entries:
+			icon_path = self.theme_entries[ 'icon_path' ]
+			image_key = 'button_image_' + key.lower()
 			button_image = icon_path + "/" + self.theme_entries[ image_key ]
 			exit_log.debug("Loading theme entry " + key + " from " + button_image)
 			self.color_button = ColoredImageButton(key, button_image, self.theme_entries, num_buttons, self.dialog_width, self.show_labels, self.button_height)
