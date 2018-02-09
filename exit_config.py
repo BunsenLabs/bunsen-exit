@@ -3,12 +3,14 @@ import logging
 import ConfigParser
 from xdg import BaseDirectory
 import collections
+import default_theme
 exit_log = logging.getLogger('Bunsen-Exit-Log')
 
 
 class Config(object):
 
 	def __init__(self):
+		self.default_theme = default_theme.Default_Theme()
 		return
 
 	def error_message(self, config_dir, src):
@@ -108,219 +110,32 @@ class Config(object):
 		return sorted_themes
 
 	def validate_theme_entries(self, theme, theme_entries):
-		# Ensure that all theme_entries conform to some sort of sensible defaults
-		# Theme entries will default to the bunsen-small theme with a grey style.
-		# In order to emulate legacy versions of this app.
-
-		# Validate name
-		try:
-			if theme_entries['name'] == "" or theme_entries['name'] == None:
-				theme_entries['name'] = "Uknown"
-				exit_log.warn("Theme entry for name was empty. Setting to Unknown")
-		except:
-			exit_log.warn("<key error>: name not found in config file. Setting name to Unknown")
-			theme_entries['name'] = "Unknown"
-
-		# Validate author
-		try:
-			if theme_entries['author'] == "" or ['window_width_adjustment'] == None:
-				theme_entries['author'] = "Uknown"
-				exit_log.warn("Theme entry for author was empty. Setting to Unknown")
-		except:
-			exit_log.warn("<key error>: author not found in config file. Setting author to Unknown")
-			theme_entries['author'] = "Unknown"
-
-		# Validate window_width_adjustment.
-		try:
-			if theme_entries['window_width_adjustment'] == "" or ['window_width_adjustment'] == None:
-				theme_entries['window_width_adjustment'] = 0.50
-				exit_log.warn("Theme entry for window_width_adjustment was empty. Setting to 0.50")
-			try:
-				temp = double(theme_entries['window_width_adjustment'])
-			except:
-				exit_log.warn["window_width_adjustment is not a float. Defaulting to 0.50"]
-				theme_entries['window_width_adjustment'] = 0.50
-		except:
-			exit_log.warn("<key error>: window_width_adjustment not found in config file.") 
-			exit_log.warn("Setting window_width_adjustment to 0.50.")
-			theme_entries['window_width_adjustment'] = 0.50
-
-		# Validate dialog_height. Early versions defaults to 130
-		try:
-			if theme_entries['dialog_height'] == "" or theme_entries['dialog_height'] == None:
-				theme_entries['dialog_height'] = 130
-				exit_log.warn("Theme entry for dialog_height was empty. Setting to 130")
-			try:
-				temp = int(theme_entries['dialog_height'])
-			except:
-				exit_log.warn("dialog_height is not an int. Defaulting to 130")
-				theme_entries['dialog_height'] = 130
-		except:
-			exit_log.warn("<key error>: dialog_height not found in config file.")
-			exit_log.warn("Setting dialog_height to 130.")
-			theme_entries['dialog_height'] = 130
-
-		# Validate button_height. For early version of this program,
-		# dialog_height was the button_height, so button_height will default to 130
-		try:
-			if theme_entries['button_height'] == "" or theme_entries['button_height'] == None:
-				theme_entries['button_height'] = 130
-				exit_log.warn("Theme entry for button_height was empty. Setting to 130")
-			try:
-				temp = int(theme_entries['button_height')
-			except:
-				exit_log.warn("button_height is not an int. Defaulting to 130")
-				theme_entries['button_height'] = 130
-		except:
-			exit_log.warn("<key error>: button_height not found in config file.")
-			exit_log.warn("Setting button_height to 130.")
-
-		# Validate inner_border. Early versions did not use this setting,
-		# so inner_border defaults to 0
-		try:
-			if theme_entries['inner_border'] == "" or theme_entries['inner_border'] == None:
-				theme_entries['inner_border'] = 0
-				exit_log.warn("Theme entry for inner_border was empty. Setting to 0.")
-			try:
-				temp = int(theme_entries['inner_border']
-			except:
-				exit_log.warn("inner_border is not an int. Defaulting to 0")
-				theme_entries['inner_border'] = 0
-		except:
-			exit_log.warn("<key error>: inner_border not found in config file.")
-			exit_log.warn("Setting inner_border to 0")
-			theme_entries['inner_border'] = 0
-
-		# Validate sleep_delay. Dafaults to 0.001
-		try:
-			if theme_entries['sleep_delay'] == "" or theme_entries['sleep_delay'] == None:
-				theme_entries['sleep_delay'] = 0.001
-				exit_log.warn("Theme entry for sleep_delay was empty. Setting to 0.001")
-			try:
-				temp = theme_entries['sleep_delay'] = float(theme_entries['sleep_delay']
-			except:
-				exit_log.warn("sleep_delay is not a float. Defaulting to 0.001")
-				theme_entries['sleep_delay'] = 0.001
-		except:
-			exit_log.warn("<key error>: sleep_delay not found in config file.")
-			exit_log.warn("Setting sleep_delay to 0.001")
-			theme_entries['sleep_delay'] = 0.001
-		
-		# Validate overall_opacity
-		try:
-			if theme_entries['overall_opacity'] == "" or theme_entries['overall_opacity'] = None:
-				theme_entries['overall_opacity'] = 80
-				exit_log.warn("overall_opacity was empty. Setting to 80")
-			try:
-				temp = int(theme_entries['overall_opacity'])
-			except:
-				exit_log.warn("overall opacity is not an int. Defaulting to 80")
-				theme_entries['overall_opacity'] = 80
-		except:
-			exit_log.warn("<key error>: overall_opacity not found in config file.")
-			exit_log.warn("Setting overall_opacity to 80")
-			theme_entries['overall_opacity'] = 80
-		
-		# Validate button spacing. Prior versions did not use this.
-		# Defaults to 0.
-		try:
-			if theme_entries['button_spacing'] == "" or theme_entries['button_spacing'] = None:
-				theme_entries['button_spacing'] = 80
-				exit_log.warn("button_spacing was empty. Setting to 0.")
-			try:
-				temp = int(theme_entries['button_spacing']
-			except:
-				exit_log.warn("button_spacing is not an int. Defaulting to 0.")
-				theme_entries['button_spacing'] = 0
-		except:
-			exit_log.warn("<key error>: button_spacing not found in config file.")
-			exit_log.warn("Setting button_spacing to 0")
-			theme_entries['button_spacing'] = 0
-		
-		# validate icon_path. If icon_path does not exist then this program
-		# should run with button labels instead of images.
-		try:
-			icon_path = theme_entries['icon_path']
-		except KeyError as err:
-			exit_log.warn("<key error>: icon_path is not found in config file.")
-			exit_log.warn("Setting icon_path to None.")
-			exit_log.warn("WARNING: running dialog without labels only.")
-			theme_entries['icon_path'] = None
-		if not theme_entries['icon_path'] == "" or theme_entries['icon_path'] == None:
-			try:
-				path = os.path_isdir(theme_entries['icon_path'])
-		except IOError as err:
-			exit_log.warn("path " + icon_path + " does not exist.")
-			theme_entries['icon_path'] = None
-		
-		# validate button_image_cancel
-		# if icon_path + / + button_image_cancel is empty or cannot be found
-		# default to building the buttons using gtk.STOCK_DIALOG_ERROR icon.
-		try:
-			image_path = theme_entries['icon_path'] + "/" + theme_entries['button_image_cancel']
-		except KeyError as err:
-			exit_log.warn("<key error>: button_image_cancel not found in config file.")
-			exit_log.warn("Building button with icon gtk.STOCK_DIALOG_ERROR")
-			theme_entries['button_image_cancel'] = gtk.STOCK_DIALOG_ERROR
-		
-		# validate button_image_poweroff
-		# if icon_path + / + button_image_poweroff is empty or cannot be found
-		# default to building the buttons using gtk.STOCK_DIALOG_ERROR icon.
-		try:
-			image_path = theme_entries['icon_path'] + "/" + theme_entries['button_image_poweroff']
-		except KeyError as err:
-			exit_log.warn("<key error>: button_image_poweroff not found in config file.")
-			exit_log.warn("Building button with icon gtk.STOCK_DIALOG_ERROR")
-			theme_entries['button_image_poweroff'] = gtk.STOCK_DIALOG_ERROR
-			
-		# validate button_image_reboot
-		# if icon_path + / + button_image_reboot is empty or cannot be found
-		# default to building the buttons using gtk.STOCK_DIALOG_ERROR icon.
-		try:
-			image_path = theme_entries['icon_path'] + "/" + theme_entries['button_image_reboot']
-		except KeyError as err:
-			exit_log.warn("<key error>: button_image_reboot not found in config file.")
-			exit_log.warn("Building button with icon gtk.STOCK_DIALOG_ERROR")
-			theme_entries['button_image_reboot'] = gtk.STOCK_DIALOG_ERROR
-		
-		# validate button_image_suspend
-		# if icon_path + / + button_image_suspend is empty or cannot be found
-		# default to building the buttons using gtk.STOCK_DIALOG_ERROR icon.
-		try:
-			image_path = theme_entries['icon_path'] + "/" + theme_entries['button_image_suspend']
-		except KeyError as err:
-			exit_log.warn("<key error>: button_image_suspend not found in config file.")
-			exit_log.warn("Building button with icon gtk.STOCK_DIALOG_ERROR")
-			theme_entries['button_image_suspend'] = gtk.STOCK_DIALOG_ERROR
-		
-		# validate button_image_logout
-		# if icon_path + / + button_image_logout is empty or cannot be found
-		# default to building the buttons using gtk.STOCK_DIALOG_ERROR icon.
-		try:
-			image_path = theme_entries['icon_path'] + "/" + theme_entries['button_image_logout']
-		except KeyError as err:
-			exit_log.warn("<key error>: button_image_logout not found in config file.")
-			exit_log.warn("Building button with icon gtk.STOCK_DIALOG_ERROR")
-			theme_entries['button_image_logout'] = gtk.STOCK_DIALOG_ERROR
-		
-		# validate button_image_hybridsleep
-		# if icon_path + / + button_image_hybridsleep is empty or cannot be found
-		# default to building the buttons using gtk.STOCK_DIALOG_ERROR icon.
-		try:
-			image_path = theme_entries['icon_path'] + "/" + theme_entries['button_image_hybridsleep']
-		except KeyError as err:
-			exit_log.warn("<key error>: button_image_hybridsleep not found in config file.")
-			exit_log.warn("Building button with icon gtk.STOCK_DIALOG_ERROR")
-			theme_entries['button_image_hybridsleep'] = gtk.STOCK_DIALOG_ERROR
-			
-		# validate button_image_hibernate
-		# if icon_path + / + button_image_hibernate is empty or cannot be found
-		# default to building the buttons using gtk.STOCK_DIALOG_ERROR icon.
-		try:
-			image_path = theme_entries['icon_path'] + "/" + theme_entries['button_image_hibernate']
-		except KeyError as err:
-			exit_log.warn("<key error>: button_image_hibernate not found in config file.")
-			exit_log.warn("Building button with icon gtk.STOCK_DIALOG_ERROR")
-			theme_entries['button_image_hibernate'] = gtk.STOCK_DIALOG_ERROR
-		
+		for key, value in self.default_theme__members__.items():
+			for theme_entry, theme_value in theme_entries:
+				if not key in theme_entries:
+					exit_log.warn("<key error>: key " + key "does not exist in config file.")
+					exit_log.warn("setting key " + key + "to default value " + value + ".")
+					theme_entries[key] = value
+				elif theme_entries[key] == "" or theme_entries[key] == None:
+						# Value does not exist so plug in a default
+						exit_log.warn("Value does not exist for key " + key + ".")
+						exit_log.warn("Setting value to " + value + ".")
+						theme_entries[key] = value
+				# Test for special conditions
+				elif theme_entry == "window_width_adjustment":
+					result = testDouble(theme_value)
+					if not result:
+						exit_log.warn("Could not parse " + theme_entry + ". Expected a double.")
+						exit_log.warn("Setting value to " + value + ".")
+						theme_entries[theme_entry] = value
+				elif theme_entry == "dialog_height" \
+					or theme_entry == "button_height" \
+					or theme_entry == "inner_border" \
+					or theme_entry == "overall_opacity" \
+					or theme_entry == "button_spacing":
+						result = testInt(theme_value)
+						if not result:
+							exit_log.warn("Could not parse " + theme_entry + ". Expected an int.")
+							exit_log.warn("Setting value to " + value + ".")
+							
 		return
