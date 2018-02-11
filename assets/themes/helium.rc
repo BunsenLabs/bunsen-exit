@@ -37,36 +37,38 @@
 # author - the author of the theme.
 # defaults to Unknown
 
-# window_width adjustment - Percentage of the scree the dialog window should occupy.
+# window_width adjustment - Percentage of the screen the dialog window should occupy.
+# Must resolve to a float.
 # defaults to 0.50
 
 # scale factor for window_width_adjustment ( 0 = default, 800px; 1 = full screen)
 
-# dialog_height - the height of the dialog window.
-# defaults to 130
+# dialog_height - the height of the dialog window. Must be resolve to an int.
+# defaults to 64
 
 # button_height - the height of the custom buttons. 
 # What appears to be a button is an event container packed with an image and
 # a label. This key determines the overall height of that container.
-# This allows the image and the label to be treated as one unit for 
-# mouse and keyboard events. When you hover over the widget, the size of that
-# This defaults to 130 in order to mimic earlier variants of this application.
+# This defaults to 64 in order to mimic earlier variants of this application.
+# Must resolve to an int.
 # NOTE: values of less than 60 tend to create clipping on the labels.
 # Similarly, values larger than the dialog_height will create clipping.
 
 # inner_border - this specifies the size of the Horizontal container that the
 # buttons get packed into. It is useful to create a thin inner border between
 # the dialog and that container. Large values may create clipping. 
+# Must resolve to an int.
 # Defaults to 0.
 
-# sleep_delay - delay for the fade in counter.
+# sleep_delay - delay for the fade in counter. Must resolve to a float.
 # This allows the dialog to fade into view.
 # defaults to 0.001
 
 # overall_opacity - opacity of the dialog from (0 - 100) with 0 being transparent.
-# defaults to 80
+# Must resolve top an int.
+# defaults to 100
 
-# button_spacing - the spacing between the buttons.
+# button_spacing - the spacing between the buttons. Must resolve to an int.
 # defaults to 0
 
 # iconpath - the path to the images you want to map to the buttons.
@@ -76,7 +78,6 @@
 # Button textures (i.e. the images on them)
 # Map file names to button types similar to below.
 # TODO: Ensure missing filenames fallback somehow (possibly stock icons?)
-# TODO: Refactor these and eliminate the camel case 
 # button_image_cancel = cancel-sm.png
 # button_image_poweroff = poweroff-sm.png
 # button_image_reboot = reboot-sm.png
