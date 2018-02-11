@@ -1,8 +1,8 @@
 Source: bunsen-exit
 Section: misc
-Priority: extra
+Priority: optional
 Maintainer: John Crawley <john@bunsenlabs.org>
-Build-Depends: debhelper (>= 9), dh-systemd (>= 1.5)
+Build-Depends: debhelper (>= 9), dh-systemd (>= 1.5), help2man
 Standards-Version: 3.9.5
 Homepage: https://github.com/BunsenLabs/bunsen-exit
 Vcs-Git: https://github.com/BunsenLabs/bunsen-exit.git
