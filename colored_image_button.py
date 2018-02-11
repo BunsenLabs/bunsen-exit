@@ -22,6 +22,7 @@ class ColoredImageButton(gtk.EventBox):
 		self.attr = pango.AttrList()
 		self.show_labels = show_labels
 		self.button_height = button_height
+		self.button_spacing = int(self.theme_entries['button_spacing'])
 		# Maps button keys to accelerators.
 		if self.key == "Cancel":
 			self.accel = "Cancel"
@@ -37,11 +38,6 @@ class ColoredImageButton(gtk.EventBox):
 			self.accel = "_HybridSleep"
 		elif self.key == "Reboot":
 			self.accel = "Re_boot"
-		try:
-			self.button_spacing = int(self.theme_entries['button_spacing'])
-		except:
-			exit_log.warn("Unable to parse button_spacing. Setting to 2")
-			self.button_spacing = 2
 		self.button_width = (dialog_width / num_buttons) - self.button_spacing
 		exit_log.debug("Setting button width to " + str(self.button_width))
 		#initialize superclass EventBox
@@ -61,7 +57,7 @@ class ColoredImageButton(gtk.EventBox):
 		if self.show_labels:
 			# create the label
 			self.label = gtk.Label()
-			self.label.modify_font(pango.FontDescription("FreeSans 12"))
+			self.label.modify_font(pango.FontDescription("Sans 12"))
 			self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
 			self.label.set_use_underline(True)
 			self.label.set_text_with_mnemonic(self.accel)
@@ -138,15 +134,13 @@ class ColoredImageButton(gtk.EventBox):
 		# Pack the image and the label into a box
 		box = gtk.VBox()
 		image = gtk.Image()
-		try:
-			image.set_from_file(button_image)
-		except IOError:
-			exit_log.warn("Unable to set button image. Using stock icon.")
+		if button_image == gtk.STOCK_DIALOG_ERROR:
 			# Need to set a stock icon for the button image if image cannot be set.
-			stock_icon = "gtk.STOCK_DIALOG_ERROR"
-			image.set_from_stock(stock_icon, self.button_height)
-			exit_log.warn("Setting stock icon to " + stock_icon)
-			
+			image.set_from_stock(button_image, gtk.ICON_SIZE_DIALOG)
+			exit_log.warn("Unable to set button image. Using stock icon.")
+			exit_log.warn("Setting stock icon to " + gtk.STOCK_DIALOG_ERROR)
+		else:
+			image.set_from_file(button_image)
 		box.pack_start(image, False, False, 0)
 		if self.label:
 			box.pack_start(label, False, False, 0)

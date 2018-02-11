@@ -145,6 +145,7 @@ def main():
 		else:
 			theme_path = bl_exit_config.get_theme_path(theme)
 			theme_entries = bl_exit_config.read_theme(theme_path)
+			theme_entries = bl_exit_config.validate_theme_entries(theme, theme_entries)
 			log_config(button_values, theme, theme_entries)
 		if LOGGING:
 			try:

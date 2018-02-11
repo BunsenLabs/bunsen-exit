@@ -2,6 +2,7 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 import gobject
+import os
 import logging
 import collections
 from colored_image_button import ColoredImageButton
@@ -74,16 +75,13 @@ class ExitGtk:
 		self.exit_bus = exit_bus
 		self.theme = theme
 		self.theme_entries= theme_entries
-		try:
-			self.dialog_height = int(self.theme_entries['dialog_height'])
-		except:
-			exit_log.warn("dialog_height not set or not an int. Setting a default of 64 pixels.")
-			self.dialog_height = 64
-		try:
-			self.button_height = int(self.theme_entries['button_height'])
-		except:
-			exit_log.warn("button height not set or not an int. Setting a default of 60 pixels.")
-			self.button_height = 60
+		self.dialog_height = int(self.theme_entries['dialog_height'])
+		self.button_height = int(self.theme_entries['button_height'])
+		self.button_spacing = int(self.theme_entries['button_spacing'])
+		self.width_adjustment = float(self.theme_entries['window_width_adjustment'])
+		self.overall_opacity = int(self.theme_entries['overall_opacity'])
+		self.sleep_delay = float(self.theme_entries['sleep_delay'])
+		self.inner_border = int(self.theme_entries['inner_border'])
 		if theme == "default":
 			# There is no config file to be found at all, so create a default
 			# gtk window using button_values that shows buttons with labels
@@ -156,11 +154,6 @@ class ExitGtk:
 		finally:
 			del x, y, display, screen, curmon
 		exit_log.debug("Detected screen_width is " + str(screen_width))
-		try:
-			self.width_adjustment = float(self.theme_entries['window_width_adjustment'])
-		except:
-			exit_log.warn("window_width_adjustment not a float. Please check config. Defaulting to 0.5")
-			self.width_adjustment = 0.5
 		if self.width_adjustment > 0:
 			self.dialog_width = int( screen_width * self.width_adjustment)
 		if self.dialog_width > screen_width:
@@ -178,27 +171,13 @@ class ExitGtk:
 		self.window.set_position(gtk.WIN_POS_CENTER)
 		windowicon = self.window.render_icon(gtk.STOCK_QUIT, gtk.ICON_SIZE_DIALOG)
 		self.window.set_icon(windowicon)
-		try:
-			self.window.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['window_background_normal']))
-		except:
-			exit_log.debug("Could not parse theme entry window_background_normal. Background will not be changed.")
+		self.window.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['window_background_normal']))
 		self.create_button_box()
-		# Get a count of the nuber of buttons to be shown
 		self.create_buttons_from_list()
-		self.window.set_size_request(self.dialog_width, int(self.dialog_height))
+		self.window.set_size_request(self.dialog_width, self.dialog_height)
 		self.window.add(self.button_box)
 		self.window.set_opacity(0)
 		self.window.show_all()
-		try:
-			self.overall_opacity = int(self.theme_entries['overall_opacity'])
-		except:
-			exit_log.warn("Problem with overall_opacity. Please check your config. Expected an int.")
-			self.overall_opacity = 100
-		try:
-			self.sleep_delay = float(self.theme_entries['sleep_delay'])
-		except:
-			exit_log.warn("Problem with sleep_delay. Please check your config. Expected a float.")
-			self.sleep_delay = 0.3
 		for i in range(1, self.overall_opacity):
 			sleep(self.sleep_delay)
 			while gtk.events_pending():
@@ -211,11 +190,6 @@ class ExitGtk:
 	def create_button_box(self):
 		self.button_box = gtk.HButtonBox()
 		self.button_box.set_layout(gtk.BUTTONBOX_SPREAD)
-		try:
-			self.inner_border = int(self.theme_entries['inner_border'])
-		except:
-			exit_log.warn("Could not parse value for inner_border. Expected an int. Check your config.")
-			self.inner_border = 4
 		self.button_box.set_size_request(self.dialog_width - self.inner_border, self.dialog_height- self.inner_border)
 		try:
 			self.button_box.set_spacing(int(self.theme_entries['button_spacing']))
@@ -262,34 +236,25 @@ class ExitGtk:
 		return True
 
 	def add_buttons(self, key, num_buttons):
-		# iconpath refers to a theme_entry in bl-exitrc.
-		# It needs to refer to  a valid path. Checks for path exists
-		# and points to an image need to be added. 
-		if 'icon_path' in self.theme_entries:
-			icon_path = self.theme_entries[ 'icon_path' ]
-			image_key = 'button_image_' + key.lower()
-			button_image = icon_path + "/" + self.theme_entries[ image_key ]
+		icon_path = self.theme_entries['icon_path']
+		image_key = 'button_image_' + key.lower()
+		button_image = icon_path + "/" + self.theme_entries[ image_key ]
+		if os.path.exists(button_image):
 			exit_log.debug("Loading theme entry " + key + " from " + button_image)
 			self.color_button = ColoredImageButton(key, button_image, self.theme_entries, num_buttons, self.dialog_width, self.show_labels, self.button_height)
 			self.color_button.set_name(key)
 			self.button_box.pack_start(self.color_button, True, True, 0)
 		else:
-			exit_log.warn("Icon path not found. Defaulting to button labels.")
-			self.color_button = gtk.Button()
+			exit_log.warn("Path does not exist for " + button_image +".")
+			button_image = gtk.STOCK_DIALOG_ERROR
+			self.color_button = ColoredImageButton(key, button_image, self.theme_entries, num_buttons, self.dialog_width, self.show_labels, self.button_height)
 			self.color_button.set_name(key)
-			self.color_button.set_relief(gtk.RELIEF_NONE)
-			self.color_button.set_label(key)
-			self.color_button.connect("clicked", self.clicked)
-			button_box.pack_start(self.color_button, True, True, 0)
+			self.button_box.pack_start(self.color_button, True, True, 0)
 		# Add custom tooltips
 		tooltip_window = gtk.Window(gtk.WINDOW_POPUP)
 		tooltip_label = gtk.Label()
 		tooltip_label.set_use_markup(True)
-		try:
-			bg_color = gtk.gdk.color_parse(self.theme_entries['tooltip_background'])
-			tooltip_window.modify_bg(gtk.STATE_NORMAL, bg_color)
-		except:
-			exit_log.debug("Could not parse theme entry tooltip_background. Leaving as default")
+		tooltip_window.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['tooltip_background']))
 		self.color_button.connect("query-tooltip", self.query_tooltip_custom_cb, key, tooltip_label, tooltip_window)
 		self.color_button.set_tooltip_window(tooltip_window)
 		tooltip_window.add(tooltip_label)
@@ -299,8 +264,6 @@ class ExitGtk:
 		return
 
 	def configure(self, theme, theme_entries):
-		# There is probably something I need to do here.
-		#self.configured_theme.set_details_from_config(self.cp, default_theme)
 		if theme != None or theme_entries != None:
 			msg = 'Loading theme \'' + theme_entries['name'] + ' by ' + theme_entries['author']
 		else:

@@ -4,19 +4,11 @@ import ConfigParser
 from xdg import BaseDirectory
 import collections
 import default_theme
+import re
 exit_log = logging.getLogger('Bunsen-Exit-Log')
 
 
 class Config(object):
-
-	def __init__(self):
-		self.default_theme = default_theme.Default_Theme()
-		return
-
-	def error_message(self, config_dir, src):
-		msg += "\n" + config_dir + " does not exist.\n"
-		exit_log.warn(msg)
-		return
 
 	def get_config_path(self):
 		"""Determine config directory: first try the environment variable
@@ -31,7 +23,8 @@ class Config(object):
 			# /etc/bunsen-exit, if it exists
 			src = '/etc/bunsen-exit/'
 			config_path = src + fname
-			self.error_message(config_dir, src)
+			exit_log.warn("Config path " + config_path + "does not exist.")
+			exit_log.warn("This dialog will run with the default gtk theme.")
 			if not os.path.exists(config_path):
 				src = '/usr/share/bunsen/skel/.config/bl-exit/'
 				if not os.path.exists(config_path):
@@ -39,23 +32,17 @@ class Config(object):
 					self.error_message(config_dir, src)
 		return config_path
 
-	def error_message(self, config_dir, src):
-		msg = "\n" + config_dir + " does not exist.\n"
-		exit_log.warn(msg)
-		return
-
 	def get_theme_path(self, theme):
-		if not theme['name'] == "default":
-			fname = ""
-			theme_dir = BaseDirectory.save_config_path('bunsen-exit')
-			try:
-				fname = theme[ 'rcfile' ]
-			except KeyError:
-				exit_log.warn("Theme not found. Running with defaults.")
-			theme_path = theme_dir + '/themes/' + fname
-			msg = 'Theme path is set to ' + theme_path
-			exit_log.info(msg)
-			return theme_path
+		fname = ""
+		theme_dir = BaseDirectory.save_config_path('bunsen-exit')
+		try:
+			fname = theme[ 'rcfile' ]
+		except KeyError:
+			exit_log.warn("Theme not found. Running with defaults.")
+		theme_path = theme_dir + '/themes/' + fname
+		msg = 'Theme path is set to ' + theme_path
+		exit_log.info(msg)
+		return theme_path
 
 	def read_config(self, config_path):
 		specified_theme = {}
@@ -86,7 +73,6 @@ class Config(object):
 			button_values = {'Cancel':'show', 'Logout':'show', 'Suspend':'show',
 									'Hibernate':'hide', 'Hybridsleep':'hide',
 									'Reboot':'show', 'Poweroff':'show'}
-			theme['name'] = "default"
 		sorted_buttons = collections.OrderedDict(sorted(button_values.items()))
 		return sorted_buttons, theme
 
@@ -109,33 +95,109 @@ class Config(object):
 		sorted_themes = collections.OrderedDict(sorted(theme_entries.items()))
 		return sorted_themes
 
-	def validate_theme_entries(self, theme, theme_entries):
-		for key, value in self.default_theme__members__.items():
-			for theme_entry, theme_value in theme_entries:
-				if not key in theme_entries:
-					exit_log.warn("<key error>: key " + key "does not exist in config file.")
-					exit_log.warn("setting key " + key + "to default value " + value + ".")
-					theme_entries[key] = value
-				elif theme_entries[key] == "" or theme_entries[key] == None:
-						# Value does not exist so plug in a default
-						exit_log.warn("Value does not exist for key " + key + ".")
-						exit_log.warn("Setting value to " + value + ".")
-						theme_entries[key] = value
-				# Test for special conditions
-				elif theme_entry == "window_width_adjustment":
-					result = testDouble(theme_value)
-					if not result:
-						exit_log.warn("Could not parse " + theme_entry + ". Expected a double.")
-						exit_log.warn("Setting value to " + value + ".")
-						theme_entries[theme_entry] = value
-				elif theme_entry == "dialog_height" \
-					or theme_entry == "button_height" \
-					or theme_entry == "inner_border" \
-					or theme_entry == "overall_opacity" \
-					or theme_entry == "button_spacing":
-						result = testInt(theme_value)
-						if not result:
-							exit_log.warn("Could not parse " + theme_entry + ". Expected an int.")
-							exit_log.warn("Setting value to " + value + ".")
-							
+	def log_theme_warning(self, key, value, var_type):
+		exit_log.warn("Could not parse " + key + ". Expected a(n) " + var_type + ".")
+		exit_log.warn("Setting value to " + str(value) + ".")
 		return
+
+	def test_entry(self, key, value, var_type):
+		if var_type == "int":
+			try:
+				temp = int(value)
+				result = True
+			except:
+				self.log_theme_warning(key, value, var_type)
+				result = False
+		elif  var_type == "float":
+			try:
+				temp = float(value)
+				result = True
+			except:
+				self.log_theme_warning(key, value, var_type)
+				result = False
+		elif var_type == "dir":
+			temp = os.path.isdir(value)
+			if temp:
+				result = True
+			else:
+				self.log_theme_warning(key, value, var_type)
+				result = False
+		elif var_type == "file":
+			temp = os.path.exists
+			if temp:
+				result = True
+			else:
+				self.log_theme_warning(key, value, var_type)
+				result = False
+		elif var_type == "color":
+			temp = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', value)
+			if temp:
+				result = True
+			else:
+				self.log_theme_warning(key, value, var_type)
+				result = False
+		return result
+
+	def validate_theme_entries(self, theme, theme_entries):
+		theme_defaults = default_theme.Default_Theme()
+		default_dict = theme_defaults.get_default_theme()
+		for key, value in default_dict.iteritems():
+			if not key in theme_entries:
+				exit_log.warn("<key error>: " + key + " does not exist in config file.")
+				exit_log.warn("setting key " + key + " to default value " + value + ".")
+				theme_entries[key] = value
+			if theme_entries[key] == "" or theme_entries[key] == None:
+				# Value does not exist so plug in a default
+				exit_log.warn("Value does not exist for key " + key + ".")
+				exit_log.warn("Setting default to " + value + ".")
+				theme_entries[key] = str(value)
+			# Test for ints
+			if key == "dialog_height" \
+				or key == "button_height" \
+				or key == "inner_border" \
+				or key == "overall_opacity" \
+				or key == "button_spacing":
+				var_type = "int"
+				result = self.test_entry(key, value, var_type)
+				if not result:
+					theme_entries[key] = str(value)
+			# Test for floats
+			if key == "sleep_delay" \
+				or key == "window_width_adjustment":
+				var_type = "float"
+				result = self.test_entry(key, value, var_type)
+				if not result:
+					theme_entries[key] = str(value)
+			# Test directory entry
+			if key == "icon_path":
+				exit_log.debug("icon_path set to " + theme_entries[key] + ".")
+				var_type = "dir"
+				result = self.test_entry(key, value, var_type)
+				if not result:
+					theme_entries[key] = str(value)
+			# Test for files
+			if key == "button_image_cancel" \
+				or key == "button_image_poweroff" \
+				or key == "button_image_reboot" \
+				or key == "button_image_suspend" \
+				or key == "button_image_logout" \
+				or key == "button_image_hybridsleep" \
+				or key == "button_image_hibernate":
+				file_path = key + "/" + value
+				var_type = "file"
+				result = self.test_entry(file_path, value, var_type)
+				if not result:
+					theme_entries[key] = str(value)
+			# test for colors
+			if key == "window_background_normal" \
+				or key == "button_background_normal" \
+				or key == "button_background_prelight" \
+				or key == "text_color_normal" \
+				or key == "text_color_prelight" \
+				or key == "tooltip_background" \
+				or key == "tooltip_foreground":
+				var_type = "color"
+				result = self.test_entry(key, value, var_type)
+				if not result:
+					theme_entries[key] = str(value)
+		return theme_entries
