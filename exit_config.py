@@ -21,20 +21,24 @@ class Config(object):
 		if not os.path.exists(config_path):
 			# Config file not present in $HOME so move from
 			# /etc/bunsen-exit, if it exists
-			src = '/etc/bunsen-exit/'
+			src = '/etc/bunsen-exit'
 			config_path = src + fname
-			exit_log.warn("Config path " + config_path + "does not exist.")
-			exit_log.warn("This dialog will run with the default gtk theme.")
 			if not os.path.exists(config_path):
-				src = '/usr/share/bunsen/skel/.config/bl-exit/'
+				src = '/usr/share/bunsen/skel/.config/bunsen-exit'
+				config_path = src + fname
 				if not os.path.exists(config_path):
 					config_path = None
-					self.error_message(config_dir, src)
 		return config_path
 
 	def get_theme_path(self, theme):
 		fname = ""
 		theme_dir = BaseDirectory.save_config_path('bunsen-exit')
+		if not theme_dir:
+			theme_dir = "/etc/bunsen-exit"
+			if not theme_dir:
+				theme_dir = "/usr/share/bunsen/skel/.config/bunsen-exit"
+				if not theme_dir:
+					theme_dir = None
 		try:
 			fname = theme[ 'rcfile' ]
 		except KeyError:
@@ -57,19 +61,28 @@ class Config(object):
 				button_visibility = config_file.items('button_values')
 			except ConfigParser.NoSectionError as err:
 				exit_log.warn(err)
-			for item in button_visibility:
-				for x in range(0, len(item)):
-					key = item[ 0 ]
-					val = item[ 1 ]
-					button_values[ key ] = val
-			specified_theme = config_file.items('theme')
+				button_values = {'Cancel':'show', 'Logout':'show', 'Suspend':'show',
+									'Hibernate':'hide', 'Hybridsleep':'hide',
+									'Reboot':'show', 'Poweroff':'show'}
+			if button_visibility:
+				for item in button_visibility:
+					for x in range(0, len(item)):
+						key = item[ 0 ]
+						val = item[ 1 ]
+						button_values[ key ] = val
+			try:
+				specified_theme = config_file.items('theme')
+			except ConfigParser.NoSectionError as err:
+				exit_log.warn(err)
+				theme['name'] = "default"
 			for item in specified_theme:
 				for x in range(0, len(item)):
 					key = item[ 0 ]
 					val = item[ 1 ]
 					theme[ key ] = val
 		else:
-			exit_log.warn("No config file found. Using defaults.")
+			theme['name'] = "default"
+			exit_log.warn("No config file found. Using default button_values.")
 			button_values = {'Cancel':'show', 'Logout':'show', 'Suspend':'show',
 									'Hibernate':'hide', 'Hybridsleep':'hide',
 									'Reboot':'show', 'Poweroff':'show'}
@@ -144,12 +157,12 @@ class Config(object):
 		for key, value in default_dict.iteritems():
 			if not key in theme_entries:
 				exit_log.warn("<key error>: " + key + " does not exist in config file.")
-				exit_log.warn("setting key " + key + " to default value " + value + ".")
+				exit_log.warn("setting key " + key + " to default value " + str(value) + ".")
 				theme_entries[key] = value
 			if theme_entries[key] == "" or theme_entries[key] == None:
 				# Value does not exist so plug in a default
 				exit_log.warn("Value does not exist for key " + key + ".")
-				exit_log.warn("Setting default to " + value + ".")
+				exit_log.warn("Setting default to " + str(value) + ".")
 				theme_entries[key] = str(value)
 			# Test for ints
 			if key == "dialog_height" \

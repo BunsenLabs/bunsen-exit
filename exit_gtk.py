@@ -13,8 +13,6 @@ exit_log = logging.getLogger('Bunsen-Exit-Log')
 
 
 class ExitGtk:
-	color_button = None
-	window = None
 	#get a DBusInterface instance, so we can send message out.
 	exit_bus = dbus_interface.DbusInterface()
 
@@ -73,16 +71,17 @@ class ExitGtk:
 		self.show_labels = False
 		self.button_values = button_values
 		self.exit_bus = exit_bus
-		self.theme = theme
-		self.theme_entries= theme_entries
-		self.dialog_height = int(self.theme_entries['dialog_height'])
-		self.button_height = int(self.theme_entries['button_height'])
-		self.button_spacing = int(self.theme_entries['button_spacing'])
-		self.width_adjustment = float(self.theme_entries['window_width_adjustment'])
-		self.overall_opacity = int(self.theme_entries['overall_opacity'])
-		self.sleep_delay = float(self.theme_entries['sleep_delay'])
-		self.inner_border = int(self.theme_entries['inner_border'])
-		if theme == "default":
+		if not theme['name'] == "default":
+			self.theme = theme['name']
+			self.theme_entries= theme_entries
+			self.dialog_height = int(self.theme_entries['dialog_height'])
+			self.button_height = int(self.theme_entries['button_height'])
+			self.button_spacing = int(self.theme_entries['button_spacing'])
+			self.width_adjustment = float(self.theme_entries['window_width_adjustment'])
+			self.overall_opacity = int(self.theme_entries['overall_opacity'])
+			self.sleep_delay = float(self.theme_entries['sleep_delay'])
+			self.inner_border = int(self.theme_entries['inner_border'])
+		if theme['name'] == "default":
 			# There is no config file to be found at all, so create a default
 			# gtk window using button_values that shows buttons with labels
 			# using the default gtk theme.
