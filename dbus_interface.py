@@ -59,6 +59,20 @@ class DbusInterface(object):
         TODO: Implement logout methods for other Window managers. See Bunsenlabs forums for details.
         """
         try:
-            subprocess.check_output([ "openbox", "--exit" ])
+            subprocess.check_output(["openbox", "--exit"])
         except subprocess.CalledProcessError as err:
-            exit_log.info(err)
+            pass
+        try:
+            subprocess.check_output(["bspc", "quit"])
+        except subprocess.CalledProcessError as err:
+            pass
+        exit_log.debug("Could not log out of Openbox or bspwm.")
+        exit_log.debug("Trying to kill the Window Manager in a more generic way")
+        try:
+            subprocess.check_output(["killall `wmctrl -m | awk '/Name/ {print tolower($2)}'`"])
+        except subprocess.CalledProcessError  as err:
+            exit_log.debug("Cannot log out of window manager.")
+            exit_log.debug("Please raise an issue on git or on the Bunsenlabs forums with the")
+            exit_log.debug("Window manager you are using, so we can add its logout command to this script.")
+        return
+

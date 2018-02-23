@@ -238,7 +238,8 @@ class Config(object):
                     or key == "inner_border" \
                     or key == "overall_opacity" \
                     or key == "button_spacing" \
-                    or key == "label_height":
+                    or key == "label_height" \
+                    or key == "font_size":
                 var_type = "int"
                 result = self.test_entry(key, value, var_type)
                 if not result:
