@@ -12,7 +12,7 @@ class ColoredImageButton(gtk.EventBox):
     is an image and a label packed into a Vbox. This box is then packed into
     an event box so that keyboard events can also be mapped.
     """
-    def __init__(self, key, button_image, theme_entries, num_buttons, dialog_width, show_labels, button_height):
+    def __init__(self, key, button_image, theme_entries, num_buttons, dialog_width, show_labels):
         """
         Creates the ColoredImageButton
         :param key: - the key in this case is the button label.
@@ -30,8 +30,9 @@ class ColoredImageButton(gtk.EventBox):
         self.theme_entries = theme_entries
         self.attr = pango.AttrList()
         self.show_labels = show_labels
-        self.button_height = button_height
+        self.button_height = int(theme_entries['button_height'])
         self.button_spacing = int(self.theme_entries['button_spacing'])
+        self.label_height = int(self.theme_entries['label_height'])
         # Maps button keys to accelerators.
         if self.key == "Cancel":
             self.accel = "Cancel"
@@ -66,7 +67,13 @@ class ColoredImageButton(gtk.EventBox):
         if self.show_labels:
             # create the label
             self.label = gtk.Label()
-            self.label.modify_font(pango.FontDescription("Sans 12"))
+            self.label_text = str(self.theme_entries['font_family'])
+            self.label_text += " "
+            self.label_text += str(self.theme_entries['font_style'])
+            self.label_text += " "
+            self.label_text += str(self.theme_entries['font_size'])
+            exit_log.warn("Setting font for labels to " + self.label_text)
+            self.label.modify_font(pango.FontDescription(self.label_text))
             self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
             self.label.set_use_underline(True)
             self.label.set_text_with_mnemonic(self.accel)
@@ -78,7 +85,7 @@ class ColoredImageButton(gtk.EventBox):
         box = self.image_label_box(self.button_image, self.label)
 
         # We have to add a little to height to account for the height of the labels.
-        box.set_size_request(self.button_width, self.button_height)
+        box.set_size_request(self.button_width, self.button_height + self.label_height)
         self.add(box)
         # set events
         self.connect("button-release-event", self.clicked)
@@ -214,9 +221,9 @@ class ColoredImageButton(gtk.EventBox):
             exit_log.warn("Setting stock icon to " + gtk.STOCK_DIALOG_ERROR)
         else:
             image.set_from_file(button_image)
-        box.pack_start(image, False, False, 0)
+        box.pack_start(image, True, True, 0)
         if self.label:
-            box.pack_start(label, False, False, 0)
+            box.pack_start(label, True, True, 0)
         return box
 
     def send_to_dbus(self, dbus_msg):

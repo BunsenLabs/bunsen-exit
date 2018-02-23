@@ -45,6 +45,10 @@ class DefaultTheme:
         self.default_theme['tooltip_background'] = '#696969'
         self.default_theme['tooltip_foreground'] = '#000000'
         self.default_theme['border_color'] = '#000040'
+        self.default_theme['font_family'] = "monospace"
+        self.default_theme['font_style'] = "bold"
+        self.default_theme['font_size'] = "8"
+
         return
 
     def get_default_theme(self):

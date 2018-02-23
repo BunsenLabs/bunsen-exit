@@ -103,7 +103,7 @@ class ExitGtk:
         self.exit_bus = exit_bus
         if not theme['name'] == "default":
             self.theme = theme['name']
-            self.theme_entries= theme_entries
+            self.theme_entries = theme_entries
             self.dialog_height = int(self.theme_entries['dialog_height'])
             self.button_height = int(self.theme_entries['button_height'])
             self.button_spacing = int(self.theme_entries['button_spacing'])
@@ -178,6 +178,7 @@ class ExitGtk:
         return
 
     def create_custom_window(self):
+
         """
         This method creates a custom window using the theme specified in
         ~/.config/bunsen-exit/bl-exitrc. If that theme cannot be found
@@ -185,7 +186,7 @@ class ExitGtk:
         """
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         # Get the screen width under the cursor
-        screen_width = 800 # fallback width
+        screen_width = 800  # fallback width
         try:
             display=gtk.gdk.Display(gtk.gdk.get_display())
             screen, x, y, flags=display.get_pointer()
@@ -313,16 +314,20 @@ class ExitGtk:
         """
         icon_path = self.theme_entries['icon_path']
         image_key = 'button_image_' + key.lower()
-        button_image = icon_path + "/" + self.theme_entries[ image_key ]
+        button_image = icon_path + "/" + self.theme_entries[image_key]
         if os.path.exists(button_image):
             exit_log.debug("Loading theme entry " + key + " from " + button_image)
-            self.color_button = ColoredImageButton(key, button_image, self.theme_entries, num_buttons, self.dialog_width, self.show_labels, self.button_height)
+            self.color_button = ColoredImageButton(key, button_image,
+                                                   self.theme_entries, num_buttons,
+                                                   self.dialog_width, self.show_labels)
             self.color_button.set_name(key)
             self.button_box.pack_start(self.color_button, True, True, 0)
         else:
-            exit_log.warn("Path does not exist for " + button_image +".")
+            exit_log.warn("Path does not exist for " + button_image + ".")
             button_image = gtk.STOCK_DIALOG_ERROR
-            self.color_button = ColoredImageButton(key, button_image, self.theme_entries, num_buttons, self.dialog_width, self.show_labels, self.button_height)
+            self.color_button = ColoredImageButton(key, button_image,
+                                                   self.theme_entries, num_buttons,
+                                                   self.dialog_width, self.show_labels)
             self.color_button.set_name(key)
             self.button_box.pack_start(self.color_button, True, True, 0)
         # Add custom tooltips

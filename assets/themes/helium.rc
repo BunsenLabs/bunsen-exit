@@ -112,8 +112,10 @@
 # Must use hexadecimal format. Defaults to #000000
 
 # border_color - Not implemented yet.
-# font_name - Not implemented yet.
-# font_size - Not implemented yet.
+
+# font_family - Sets the font family for labels, e.g. sans, serif, monospace
+# font_style - Sets the font style, e.g. bold, or bold, italic condensed
+# font_size - Sets the font size for font_labels.
 
 [theme]
 
@@ -164,6 +166,7 @@ tooltip_foreground = #00ffff
 # border_color = #000040
 
 # Fonts
-# font_name - TODO
-# font_size - TODO
+font_family = Noto Sans
+font_style = regular
+font_size = 11
 
