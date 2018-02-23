@@ -1,12 +1,9 @@
 import pygtk
 pygtk.require('2.0')
 import gtk
-import gobject
 import os
 import logging
-import collections
 from colored_image_button import ColoredImageButton
-import struct
 from time import sleep
 import dbus_interface
 
@@ -60,13 +57,13 @@ class ExitGtk:
         elif keyval_name == 'Shift_L':
             self.show_labels = not self.show_labels
             if self.show_labels:
-                self.dialog_height = self.dialog_height + 20
-                self.button_height = self.button_height + 20
+                self.dialog_height = self.dialog_height + int(self.label_height)
+                self.button_height = self.button_height + int(self.label_height)
                 self.button_box.destroy()
                 self.window.set_size_request(self.dialog_width, int(self.dialog_height))
             else:
-                self.dialog_height = self.dialog_height - 20
-                self.button_height = self.button_height - 20
+                self.dialog_height = self.dialog_height - int(self.label_height)
+                self.button_height = self.button_height - int(self.label_height)
                 self.button_box.destroy()
                 self.window.set_size_request(self.dialog_width, int(self.dialog_height))
             self.create_button_box()
@@ -114,6 +111,7 @@ class ExitGtk:
             self.overall_opacity = int(self.theme_entries['overall_opacity'])
             self.sleep_delay = float(self.theme_entries['sleep_delay'])
             self.inner_border = int(self.theme_entries['inner_border'])
+            self.label_height = int(self.theme_entries['label_height'])
         if theme['name'] == "default":
             # There is no config file to be found at all, so create a default
             # gtk window using button_values that shows buttons with labels

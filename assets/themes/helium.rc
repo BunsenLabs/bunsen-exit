@@ -85,6 +85,11 @@
 # button_image_hybridsleep = hibernate-sm.png
 # button_image_hibernate = hibernate-sm.png
 
+# label_height - Additional height to add to the dialog when <Shift> is pressed
+# and button labels are shown. Increase this value for larger fonts or fonts with odd
+# ascenders/descenders that end up clipped.
+# Defaults to 20. Must be an int.
+
 # window_background_normal - the color of the dialog window
 # Must use hexadecimal color format. Defaults to #838383
 
@@ -136,6 +141,9 @@ button_image_suspend = sleep-sm.png
 button_image_logout = logout-sm.png
 button_image_hybridsleep = hibernate-sm.png
 button_image_hibernate = hibernate-sm.png
+
+# Label Height
+label_height = 20
 
 # Window Colors
 window_background_normal = #284F63

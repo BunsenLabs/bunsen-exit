@@ -36,6 +36,7 @@ class DefaultTheme:
         self.default_theme['button_image_logout'] = "logout-sm.png"
         self.default_theme['button_image_hybridsleep'] = "hibernate-sm.png"
         self.default_theme['button_image_hibernate'] = "hibernate-sm.png"
+        self.default_theme['label_height'] = 20
         self.default_theme['window_background_normal'] = '#696969'
         self.default_theme['button_background_normal'] = '#696969'
         self.default_theme['button_background_prelight'] = '#838383'
