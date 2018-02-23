@@ -56,7 +56,6 @@ class DbusInterface(object):
     def logout(self):
         """
         Dbus does not handle logout commands, so those need to be handled separately here.
-        TODO: Implement logout methods for other Window managers. See Bunsenlabs forums for details.
         """
         try:
             subprocess.check_output(["openbox", "--exit"])
@@ -75,4 +74,3 @@ class DbusInterface(object):
             exit_log.debug("Please raise an issue on git or on the Bunsenlabs forums with the")
             exit_log.debug("Window manager you are using, so we can add its logout command to this script.")
         return
-

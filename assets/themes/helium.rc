@@ -170,3 +170,9 @@ font_family = Noto Sans
 font_style = regular
 font_size = 11
 
+# Tooltip Fonts
+# tooltip_font_family - TODO
+# tooltip_font_style - TODO
+# tool_tip_font_size - TODO
+
+
