@@ -6,6 +6,7 @@
 #    Copyright (C) 2012 Philip Newborough  <corenominal@corenominal.org>
 #    Copyright (C) 2016 xaos52  <xaos52@gmail.com>
 #    Copyright (C) 2017 damo  <damo@bunsenlabs.org>
+#    Copyright (C) 2018 tknomanzr <webradley9929@gmail.com>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -32,7 +33,6 @@ import default_theme
 import collections
 
 DISPLAY = os.environ.get('DISPLAY') is not None
-LOGGING = True
 
 exit_log = logging.getLogger('Bunsen-Exit-Log')
 
@@ -55,6 +55,11 @@ def get_options():
                         action="store_true")
     parser.add_argument("-p", "--poweroff", help="Power off",
                         action="store_true")
+    parser.add_argument("-f", "--logfile", help="The file to log too",
+                        action="store", dest="logfile", default="None")
+    parser.add_argument("-z", "--loglevel", help="Verbosity of the logging, Info, Warn, or Debug",
+                        action="store", dest="loglevel", default="None")
+    print (parser.parse_args())
     args = parser.parse_args()
     return args
 
@@ -116,16 +121,19 @@ def main():
         -b	--reboot		Reboot the system.
         -p	--poweroff		Power off the system.
 
-    The following three options determine how to handle errors in the
-    program.
-        -d	--dialog		Send errors to a gtk dialog. Defaults to False.
-        -z	--logfile		Log files to ~/bunsen_exit.log
+        -f	--logfile		Which file to log too, e.g. ~/gl-exit.log or ~/.xsession-errors
+        -z  --loglevel      The default logging level can be one of:
+                            None - Logging turned off or sent to /dev/null
+                            Info - only log [INFO] messages.
+                            Warn - log [WARN] and [INFO] messages.
+                            Debug - log all messages.
     """
     args = get_options()
-    if LOGGING:
-        # Start the logger
-        fname = "/bl_exit.log"
-        exit_log = logger.setup_logging(fname)
+    loglevel = args.loglevel
+    # Start the logger
+    fname = args.logfile
+    exit_log = logger.setup_logging(fname, loglevel)
+
     # Start the dbus interface
     exit_bus = dbus_interface.DbusInterface()
 
@@ -155,13 +163,13 @@ def main():
         config_path = bl_exit_config.get_config_path()
         if config_path:
             msg = 'Configuration file found at ' + config_path
-            if LOGGING:
+            if loglevel is not 'None':
                 exit_log.info(msg)
             else:
                 print(msg)
         else:
             msg = "No configuration file found. Using default gtk theme."
-        if LOGGING:
+        if loglevel is not "None":
             exit_log.warn(msg)
         else:
             print(msg)

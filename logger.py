@@ -5,7 +5,7 @@ import sys
 import traceback
 
 
-def setup_logging(fname):
+def setup_logging(fname, loglevel):
     """
     Set up logging to the specified filename
     Args:
@@ -17,17 +17,49 @@ def setup_logging(fname):
 
     """
     try:
-        path = os.path.expanduser('~')
-        path = path + fname
+        if loglevel is "None":
+            # If loglevel is None then dump logs to /dev/null.
+            # This way they will still print to console.
+            path = "/dev/null"
+        else:
+            if fname is "None":
+                path = os.path.expanduser('~')
+                path = path + "/.xsession-errors"
+            else:
+                path = os.path.expanduser('~')
+                path = path + fname
         sys.path.append(path)
-        log = logging.getLogger('Bunsen-Exit-Log')
-        log.setLevel(logging.DEBUG)
         # create a file handler
         file_handler = logging.FileHandler(path)
-        file_handler.setLevel(logging.DEBUG)
         # Create a console handler
         console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.DEBUG)
+        log = logging.getLogger('Bunsen-Exit-Log')
+        if loglevel == "Debug":
+            log.setLevel(logging.DEBUG)
+            file_handler.setLevel(logging.DEBUG)
+            console_handler.setLevel(logging.DEBUG)
+        elif loglevel == "Warn":
+            log.setLevel(logging.WARN)
+            file_handler.setLevel(logging.WARN)
+            console_handler.setLevel(logging.WARN)
+        elif loglevel == "Info":
+            log.setLevel(logging.INFO)
+            file_handler.setLevel(logging.INFO)
+            console_handler.setLevel(logging.INFO)
+        elif loglevel == "None":
+            log.setLevel(logging.INFO)
+            file_handler.setLevel(logging.INFO)
+            console_handler.setLevel(logging.INFO)
+        else:
+            print("--------------------------------------")
+            print("Unknown option for loglevel " + loglevel)
+            print("Expected one of, Debug, Warn, or Info.")
+            print("Setting default to Warn.")
+            print("--------------------------------------")
+            log.setLevel(logging.WARN)
+            file_handler.setLevel(logging.WARN)
+            console_handler.setLevel(logging.WARN)
+
         # create a logging format
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)

@@ -241,21 +241,21 @@ class Config(object):
                 var_type = "int"
                 result = self.test_entry(key, value, var_type)
                 if not result:
-                    theme_entries[ key ] = str(value)
+                    theme_entries[key] = str(value)
             # Test for floats
             if key == "sleep_delay" \
                     or key == "window_width_adjustment":
                 var_type = "float"
                 result = self.test_entry(key, value, var_type)
                 if not result:
-                    theme_entries[ key ] = str(value)
+                    theme_entries[key] = str(value)
             # Test directory entry
             if key == "icon_path":
                 exit_log.debug("icon_path set to " + theme_entries[ key ] + ".")
                 var_type = "dir"
                 result = self.test_entry(key, value, var_type)
                 if not result:
-                    theme_entries[ key ] = str(value)
+                    theme_entries[key] = str(value)
             # Test for files
             if key == "button_image_cancel" \
                     or key == "button_image_poweroff" \
