@@ -6,6 +6,16 @@ import traceback
 
 
 def setup_logging(fname):
+    """
+    Set up logging to the specified filename
+    Args:
+        fname: the filename to log too. This file will appear under home. For instance,
+        when testing, I typically log to ~/bl_exit.log. However, we would typically want to
+        log to ~/.xsession-errors
+
+    Returns:
+
+    """
     try:
         path = os.path.expanduser('~')
         path = path + fname

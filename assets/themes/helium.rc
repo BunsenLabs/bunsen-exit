@@ -71,13 +71,12 @@
 # button_spacing - the spacing between the buttons. Must resolve to an int.
 # defaults to 0
 
-# iconpath - the path to the images you want to map to the buttons.
+# icon_path - the path to the images you want to map to the buttons.
 # If this path cannot be found, then the dialog will fall back to a default 
 # gtk dialog. 
 
 # Button textures (i.e. the images on them)
 # Map file names to button types similar to below.
-# TODO: Ensure missing filenames fallback somehow (possibly stock icons?)
 # button_image_cancel = cancel-sm.png
 # button_image_poweroff = poweroff-sm.png
 # button_image_reboot = reboot-sm.png
@@ -87,39 +86,25 @@
 # button_image_hibernate = hibernate-sm.png
 
 # window_background_normal - the color of the dialog window
-# Must use hexadecimal color format
-# Will regex validate
-# defaults to #838383
+# Must use hexadecimal color format. Defaults to #838383
 
 # button_background_normal - the normal color of the button
-# Must use hexadecimal format
-# Will regex validate
-# defaults to #838383
+# Must use hexadecimal format. Defaults to #838383
 
 # button_background_prelight - the highlighted color of the button.
-# Must use hexadecimal format
-# Will regex validate
-# defaults to #c1c1c1
+# Must use hexadecimal format. Defaults to #c1c1c1
 
 # text_color_normal - the normal text color for labels.
-# Must use hexadecimal format
-# Will regex validate
-# defaults to #d9d9d9
+# Must use hexadecimal format. Defaults to #d9d9d9
 
 # text_color_prelight - the highlighted text color of labels.
-# Must use hexadecimal format.
-# Will regex validate
-# defaults to #d9d9d9
+# Must use hexadecimal format. Defaults to #d9d9d9
 
 # tooltip_background - the color of tooltip backgrounds
-# Must use hexadecimal format
-# Will regex validate
-# defaults to #c1c1c1
+# Must use hexadecimal format. Defaults to #c1c1c1
 
 # tooltip_foreground - the tooltip text color
-# Must use hexadecimal format
-# Will regex validate
-# Defaults to #000000
+# Must use hexadecimal format. Defaults to #000000
 
 # border_color - Not implemented yet.
 # font_name - Not implemented yet.
