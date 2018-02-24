@@ -27,7 +27,7 @@ def setup_logging(fname, loglevel):
                 path = path + "/.xsession-errors"
             else:
                 path = os.path.expanduser('~')
-                path = path + fname
+                path = path + "/" + fname
         sys.path.append(path)
         # create a file handler
         file_handler = logging.FileHandler(path)

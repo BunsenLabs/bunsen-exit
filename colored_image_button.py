@@ -23,7 +23,6 @@ class ColoredImageButton(gtk.EventBox):
         :param dialog_width: the width of the dialog. Button width is basically
         (dialog_width / num_buttons) - button_spacing.
         :param show_labels: whether to show/hide the labels.
-        :param button_height: the height of the buttons.
         """
         self.key = key
         self.button_image = button_image
@@ -72,7 +71,6 @@ class ColoredImageButton(gtk.EventBox):
             self.label_text += str(self.theme_entries['font_style'])
             self.label_text += " "
             self.label_text += str(self.theme_entries['font_size'])
-            exit_log.warn("Setting font for labels to " + self.label_text)
             self.label.modify_font(pango.FontDescription(self.label_text))
             self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
             self.label.set_use_underline(True)

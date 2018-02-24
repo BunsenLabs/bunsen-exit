@@ -70,4 +70,3 @@ class DefaultTheme:
 
         """
         return self.default_theme[key]
-

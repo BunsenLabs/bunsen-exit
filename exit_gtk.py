@@ -188,8 +188,8 @@ class ExitGtk:
         # Get the screen width under the cursor
         screen_width = 800  # fallback width
         try:
-            display=gtk.gdk.Display(gtk.gdk.get_display())
-            screen, x, y, flags=display.get_pointer()
+            display = gtk.gdk.Display(gtk.gdk.get_display())
+            screen, x, y, flags = display.get_pointer()
             curmon = screen.get_monitor_at_point(x, y)
             _, _, screen_width, _ = screen.get_monitor_geometry(curmon)
         except:
