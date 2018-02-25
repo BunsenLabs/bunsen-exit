@@ -1,17 +1,19 @@
 import pygtk
-pygtk.require('2.0')
 import gtk
 import pango
 import os
 import logging
-from colored_image_button import ColoredImageButton
+from custom_button import ColoredImageButton
 from time import sleep
 import dbus_interface
+import default_theme
+import validator
+pygtk.require('2.0')
 
 exit_log = logging.getLogger('Bunsen-Exit-Log')
 
 
-class ExitGtk:
+class Gui:
     """
     This class creates a gtk based exit dialog. If no config files can be found
     whatsoever, a default gtk dialog will be created. However, if a config file
@@ -102,17 +104,35 @@ class ExitGtk:
         self.show_labels = False
         self.button_values = button_values
         self.exit_bus = exit_bus
+        self.default = default_theme.DefaultTheme()
+        self.entry_validator = validator.Validator()
         if not theme['name'] == "default":
             self.theme = theme['name']
             self.theme_entries = theme_entries
-            self.dialog_height = int(self.theme_entries['dialog_height'])
-            self.button_height = int(self.theme_entries['button_height'])
-            self.button_spacing = int(self.theme_entries['button_spacing'])
-            self.inner_border = int(self.theme_entries['inner_border'])
-            self.width_adjustment = float(self.theme_entries['window_width_adjustment'])
-            self.overall_opacity = int(self.theme_entries['overall_opacity'])
-            self.sleep_delay = float(self.theme_entries['sleep_delay'])
-            self.label_height = int(self.theme_entries['label_height'])
+            # Sanitize input from config file and set to defaults if input is bad.
+            key = "dialog_height"
+            self.dialog_height = self.entry_validator.parse_int(key, self.theme_entries[key])
+            key = "button_height"
+            self.button_height = self.entry_validator.parse_int(key, self.theme_entries[key])
+            key = "button_spacing"
+            self.button_spacing = self.entry_validator.parse_int(key, self.theme_entries[key])
+            key = "inner_border"
+            self.inner_border = self.entry_validator.parse_int(key, self.theme_entries[key])
+            key = "window_width_adjustment"
+            self.width_adjustment = self.entry_validator.parse_float(key, self.theme_entries[key])
+            key = "overall_opacity"
+            self.overall_opacity = self.entry_validator.parse_int(key, self.theme_entries[key])
+            key = "sleep_delay"
+            self.sleep_delay = self.entry_validator.parse_float(key, self.theme_entries[key])
+            key = "label_height"
+            self.label_height = self.entry_validator.parse_int(key, self.theme_entries[key])
+            key = "window_background_normal"
+            self.window_background_normal = self.entry_validator.parse_color(key, self.theme_entries[key])
+            key = "tooltip_background"
+            self.tooltip_background = self.entry_validator.parse_color(key, self.theme_entries[key])
+            key = "tooltip_foreground"
+            self.tooltip_foreground = self.entry_validator.parse_color(key, self.theme_entries[key])
+            # Other instance variables
             self.dialog_width = 0
             self.button_box = None
             self.window = None
@@ -170,15 +190,14 @@ class ExitGtk:
             # only add buttons that are to be shown
             if value == 'show':
                 exit_log.info('Creating button for ' + key)
-                self.button = gtk.Button()
-                self.button.set_name(key)
-                self.button.set_relief(gtk.RELIEF_NONE)
-                self.button.set_label(key)
-                self.button.connect("clicked", self.clicked)
-                self.button_box.pack_start(self.button, True, True, 0)
+                button = gtk.Button()
+                button.set_name(key)
+                button.set_relief(gtk.RELIEF_NONE)
+                button.set_label(key)
+                button.connect("clicked", self.clicked)
+                self.button_box.pack_start(button, True, True, 0)
         self.window.add(self.button_box)
-        self.button_box.show()
-        self.button.show()
+        self.window.show_all()
         return
 
     def create_custom_window(self):
@@ -202,7 +221,7 @@ class ExitGtk:
             del x, y, display, screen, curmon
         exit_log.debug("Detected screen_width is " + str(screen_width))
         if self.width_adjustment > 0:
-            self.dialog_width = int( screen_width * self.width_adjustment)
+            self.dialog_width = int(screen_width * self.width_adjustment)
         if self.dialog_width > screen_width:
             self.dialog_width = screen_width
         exit_log.debug("Dialog width is set to " + str(self.dialog_width))
@@ -219,7 +238,7 @@ class ExitGtk:
         self.window.set_position(gtk.WIN_POS_CENTER)
         window_icon = self.window.render_icon(gtk.STOCK_QUIT, gtk.ICON_SIZE_DIALOG)
         self.window.set_icon(window_icon)
-        self.window.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['window_background_normal']))
+        self.window.modify_bg(gtk.STATE_NORMAL, self.window_background_normal)
         self.create_button_box()
         self.create_buttons_from_list()
         self.window.set_size_request(self.dialog_width, self.dialog_height)
@@ -247,7 +266,7 @@ class ExitGtk:
         self.button_box = gtk.HButtonBox()
         self.button_box.set_layout(gtk.BUTTONBOX_SPREAD)
         self.button_box.set_size_request(self.dialog_width - self.inner_border, self.dialog_height - self.inner_border)
-        self.button_box.set_spacing(int(self.theme_entries['button_spacing']))
+        self.button_box.set_spacing(self.button_spacing)
         return
 
     def create_buttons_from_list(self):
@@ -301,15 +320,13 @@ class ExitGtk:
         Returns: True - I don't know why.
 
         """
-        fg_color = self.theme_entries['tooltip_foreground']
         tooltip_font = self.theme_entries['tooltip_font_family']
         tooltip_font += " "
         tooltip_font += self.theme_entries['tooltip_font_style']
         tooltip_font += " "
         tooltip_font += self.theme_entries['tooltip_font_size']
         tooltip_label.modify_font(pango.FontDescription(tooltip_font))
-        label_markup = '<span foreground="' + fg_color + '">' + key + '</span>'
-        tooltip_label.set_markup(label_markup)
+        tooltip_label.set_markup(key)
         tooltip_label.show()
         return True
 
@@ -345,7 +362,8 @@ class ExitGtk:
         tooltip_window = gtk.Window(gtk.WINDOW_POPUP)
         tooltip_label = gtk.Label()
         tooltip_label.set_use_markup(True)
-        tooltip_window.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['tooltip_background']))
+        tooltip_window.modify_bg(gtk.STATE_NORMAL, self.tooltip_background)
+        tooltip_label.modify_fg(gtk.STATE_NORMAL, self.tooltip_foreground)
         self.color_button.connect("query-tooltip", self.query_tooltip_custom_cb, key, tooltip_label, tooltip_window)
         self.color_button.set_tooltip_window(tooltip_window)
         tooltip_window.add(tooltip_label)

@@ -22,31 +22,40 @@ def setup_logging(fname, loglevel):
             # This way they will still print to console.
             path = "/dev/null"
         else:
-            if fname is "None":
+            # If the filename entered on the command line is None or does not exist,
+            # then log to ~/.xsession-errors.
+            # I chose to allow logging to other file because ~/.xsession-errors can get quite spammy
+            # and it might be important to have clear logs while designing.
+            if fname == "None":
                 path = os.path.expanduser('~')
                 path = path + "/.xsession-errors"
             else:
-                path = os.path.expanduser('~')
-                path = path + "/" + fname
+                if fname.startswith("~"):
+                    path = os.path.expanduser('~')
+                    fname = fname.replace("~", "")
+                    path = path + fname
+                else:
+                    path = fname
         sys.path.append(path)
         # create a file handler
         file_handler = logging.FileHandler(path)
         # Create a console handler
         console_handler = logging.StreamHandler()
         log = logging.getLogger('Bunsen-Exit-Log')
-        if loglevel == "Debug":
+        loglevel = loglevel.lower()
+        if loglevel == "debug":
             log.setLevel(logging.DEBUG)
             file_handler.setLevel(logging.DEBUG)
             console_handler.setLevel(logging.DEBUG)
-        elif loglevel == "Warn":
+        elif loglevel == "warn":
             log.setLevel(logging.WARN)
             file_handler.setLevel(logging.WARN)
             console_handler.setLevel(logging.WARN)
-        elif loglevel == "Info":
+        elif loglevel == "info":
             log.setLevel(logging.INFO)
             file_handler.setLevel(logging.INFO)
             console_handler.setLevel(logging.INFO)
-        elif loglevel == "None":
+        elif loglevel == "none":
             log.setLevel(logging.INFO)
             file_handler.setLevel(logging.INFO)
             console_handler.setLevel(logging.INFO)

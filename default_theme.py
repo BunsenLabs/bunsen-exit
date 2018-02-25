@@ -40,7 +40,6 @@ class DefaultTheme:
         self.default_theme['window_background_normal'] = '#696969'
         self.default_theme['button_background_normal'] = '#696969'
         self.default_theme['button_background_prelight'] = '#838383'
-        self.default_theme['button_border_type'] = None
         self.default_theme['text_color_normal'] = '#000000'
         self.default_theme['text_color_prelight'] = '#ffffff'
         self.default_theme['tooltip_background'] = '#696969'

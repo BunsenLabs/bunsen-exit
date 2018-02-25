@@ -27,10 +27,11 @@ import logger
 import logging
 import argparse
 import dbus_interface
-import exit_config
-import exit_gtk
+import config
+import gui
 import default_theme
 import collections
+import validator
 
 DISPLAY = os.environ.get('DISPLAY') is not None
 
@@ -159,20 +160,13 @@ def main():
             exit_log.debug('No valid xserver found. Please use a command line option')
             sys.exit(1)
 
-        bl_exit_config = exit_config.Config()
+        bl_exit_config = config.Config()
         config_path = bl_exit_config.get_config_path()
         if config_path:
             msg = 'Configuration file found at ' + config_path
-            if loglevel is not 'None':
-                exit_log.info(msg)
-            else:
-                print(msg)
+            exit_log.info(msg)
         else:
             msg = "No configuration file found. Using default gtk theme."
-        if loglevel is not "None":
-            exit_log.warn(msg)
-        else:
-            print(msg)
         button_values, theme = bl_exit_config.read_config(config_path)
         if theme['name'] == "default":
             theme_entries = None
@@ -181,10 +175,12 @@ def main():
         else:
             theme_path = bl_exit_config.get_theme_path(theme)
             theme_entries = bl_exit_config.read_theme(theme_path)
-            theme_entries = bl_exit_config.validate_theme_entries(theme, theme_entries)
+            entry_validator = validator.Validator()
+            # Check for missing keys or empty values
+            theme_entries = entry_validator.validate_keys(theme_entries)
             log_config(button_values, theme, theme_entries)
         # Start to create the gtk interface
-        bl_exit_gtk = exit_gtk.ExitGtk(button_values, exit_bus, theme, theme_entries)
+        bl_exit_gtk = gui.Gui(button_values, exit_bus, theme, theme_entries)
         # Pass control over to exit_gtk.
         bl_exit_gtk.main()
         return

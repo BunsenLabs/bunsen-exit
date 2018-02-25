@@ -2,6 +2,7 @@ import gtk
 import pango
 import dbus_interface
 import logging
+import validator
 
 exit_log = logging.getLogger('Bunsen-Exit-Log')
 
@@ -30,10 +31,23 @@ class ColoredImageButton(gtk.EventBox):
         self.theme_entries = theme_entries
         self.attr = pango.AttrList()
         self.show_labels = show_labels
-        self.button_spacing = int(self.theme_entries[ 'button_spacing' ])
-        self.button_height = int(theme_entries['button_height'])
+        self.entry_validator = validator.Validator()
+        item = "button_spacing"
+        self.button_spacing = self.entry_validator.parse_int(item, theme_entries[item])
+        item = "button_height"
+        self.button_height = self.entry_validator.parse_int(item, theme_entries[item])
+        item = "label_height"
+        self.label_height = self.entry_validator.parse_int(item, theme_entries[item])
+        item = "text_color_normal"
+        self.text_color_normal = self.entry_validator.parse_color(item, theme_entries[item])
+        item = "text_color_prelight"
+        self.text_color_prelight = self.entry_validator.parse_color(item, theme_entries[item])
+        item = "button_background_normal"
+        self.button_background_normal = self.entry_validator.parse_color(item, theme_entries[item])
+        item = "button_background_prelight"
+        self.button_background_prelight = self.entry_validator.parse_color(item, theme_entries[item])
+
         self.button_width = (dialog_width / num_buttons) - self.button_spacing
-        self.label_height = int(self.theme_entries['label_height'])
 
         # Maps button keys to accelerators.
         if self.key == "Cancel":
@@ -50,6 +64,7 @@ class ColoredImageButton(gtk.EventBox):
             self.accel = "_HybridSleep"
         elif self.key == "Reboot":
             self.accel = "Re_boot"
+
         exit_log.debug("Setting button width to " + str(self.button_width))
         # initialize superclass EventBox
         super(ColoredImageButton, self).__init__()
@@ -74,13 +89,13 @@ class ColoredImageButton(gtk.EventBox):
             self.label_text += " "
             self.label_text += str(self.theme_entries['font_size'])
             self.label.modify_font(pango.FontDescription(self.label_text))
-            self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
+            self.label.modify_fg(gtk.STATE_NORMAL, self.text_color_normal)
             self.label.set_use_underline(True)
             self.label.set_text_with_mnemonic(self.accel)
         else:
             self.label = None
         # colorize the button upon init
-        self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_normal']))
+        self.modify_bg(gtk.STATE_NORMAL, self.button_background_normal)
         # Add the image_label box
         custom_button = self.image_label_box(self.button_image, self.label)
 
@@ -149,9 +164,9 @@ class ColoredImageButton(gtk.EventBox):
         Returns:
 
         """
-        self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_prelight']))
+        self.modify_bg(gtk.STATE_NORMAL, self.button_background_prelight)
         if self.show_labels:
-            self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_prelight']))
+            self.label.modify_fg(gtk.STATE_NORMAL, self.text_color_prelight)
             self.label.set_text_with_mnemonic(self.accel)
         self.show_all()
         return
@@ -163,9 +178,9 @@ class ColoredImageButton(gtk.EventBox):
         widget: the widget that received the event
         event: the event
         """
-        self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_normal']))
+        self.modify_bg(gtk.STATE_NORMAL, self.button_background_normal)
         if self.show_labels:
-            self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
+            self.label.modify_fg(gtk.STATE_NORMAL, self.text_color_normal)
             self.label.set_text_with_mnemonic(self.accel)
         self.show_all()
 
@@ -180,9 +195,9 @@ class ColoredImageButton(gtk.EventBox):
 
         """
         self.grab_focus()
-        self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_prelight']))
+        self.modify_bg(gtk.STATE_NORMAL, self.button_background_prelight)
         if self.show_labels:
-            self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_prelight']))
+            self.label.modify_fg(gtk.STATE_NORMAL, self.text_color_prelight)
             self.label.set_text_with_mnemonic(self.accel)
         self.show_all()
         return
@@ -194,9 +209,9 @@ class ColoredImageButton(gtk.EventBox):
         widget: the widget that received the event
         event: the event.
         """
-        self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_normal']))
+        self.modify_bg(gtk.STATE_NORMAL, self.button_background_prelight)
         if self.show_labels:
-            self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['text_color_normal']))
+            self.label.modify_fg(gtk.STATE_NORMAL, self.text_color_normal)
             self.label.set_text_with_mnemonic(self.accel)
         self.show_all()
 
