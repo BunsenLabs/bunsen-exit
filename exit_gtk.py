@@ -107,11 +107,14 @@ class ExitGtk:
             self.dialog_height = int(self.theme_entries['dialog_height'])
             self.button_height = int(self.theme_entries['button_height'])
             self.button_spacing = int(self.theme_entries['button_spacing'])
+            self.inner_border = int(self.theme_entries['inner_border'])
             self.width_adjustment = float(self.theme_entries['window_width_adjustment'])
             self.overall_opacity = int(self.theme_entries['overall_opacity'])
             self.sleep_delay = float(self.theme_entries['sleep_delay'])
-            self.inner_border = int(self.theme_entries['inner_border'])
             self.label_height = int(self.theme_entries['label_height'])
+            self.dialog_width = 0
+            self.button_box = None
+            self.window = None
         if theme['name'] == "default":
             # There is no config file to be found at all, so create a default
             # gtk window using button_values that shows buttons with labels
@@ -202,6 +205,7 @@ class ExitGtk:
         if self.dialog_width > screen_width:
             self.dialog_width = screen_width
         exit_log.debug("Dialog width is set to " + str(self.dialog_width))
+        exit_log.debug("Dialog Height is set to" + str(self.dialog_height))
         # Format the window.
         self.window.set_name('Bunsen Exit')
         self.window.set_decorated(False)
@@ -241,7 +245,7 @@ class ExitGtk:
         """
         self.button_box = gtk.HButtonBox()
         self.button_box.set_layout(gtk.BUTTONBOX_SPREAD)
-        self.button_box.set_size_request(self.dialog_width - self.inner_border, self.dialog_height- self.inner_border)
+        self.button_box.set_size_request(self.dialog_width - self.inner_border, self.dialog_height - self.inner_border)
         self.button_box.set_spacing(int(self.theme_entries['button_spacing']))
         return
 
@@ -321,7 +325,7 @@ class ExitGtk:
                                                    self.theme_entries, num_buttons,
                                                    self.dialog_width, self.show_labels)
             self.color_button.set_name(key)
-            self.button_box.pack_start(self.color_button, True, True, 0)
+            self.button_box.pack_start(self.color_button, False, False, self.button_spacing)
         else:
             exit_log.warn("Path does not exist for " + button_image + ".")
             button_image = gtk.STOCK_DIALOG_ERROR
@@ -329,7 +333,7 @@ class ExitGtk:
                                                    self.theme_entries, num_buttons,
                                                    self.dialog_width, self.show_labels)
             self.color_button.set_name(key)
-            self.button_box.pack_start(self.color_button, True, True, 0)
+            self.button_box.pack_start(self.color_button, False, False, self.button_spacing)
         # Add custom tooltips
         tooltip_window = gtk.Window(gtk.WINDOW_POPUP)
         tooltip_label = gtk.Label()

@@ -125,16 +125,16 @@ author = BunsenLabs
 
 # Dialog
 window_width_adjustment = 0.50
-dialog_height = 66
-button_height = 62
-inner_border = 4
+dialog_height = 70
+inner_border = 5
 
 # Opacity
 sleep_delay = 0.003
-overall_opacity = 80
+overall_opacity =
 
 # Buttons
-button_spacing = 4
+button_height = 62
+button_spacing = 5
 icon_path = /usr/share/images/bunsen/exit/light
 button_image_cancel = cancel-sm.png
 button_image_poweroff = poweroff-sm.png
@@ -155,7 +155,7 @@ button_background_normal = #284F63
 button_background_prelight = #678B8B
 
 # Text Colors
-text_color_normal = #00ffff
+text_color_normal = #ffffff
 text_color_prelight = #000000
 
 # Tooltip Colors

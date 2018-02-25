@@ -32,6 +32,7 @@ class ColoredImageButton(gtk.EventBox):
         self.button_height = int(theme_entries['button_height'])
         self.button_spacing = int(self.theme_entries['button_spacing'])
         self.label_height = int(self.theme_entries['label_height'])
+        self.button_width = (dialog_width / num_buttons) - self.button_spacing
         # Maps button keys to accelerators.
         if self.key == "Cancel":
             self.accel = "Cancel"
@@ -47,7 +48,6 @@ class ColoredImageButton(gtk.EventBox):
             self.accel = "_HybridSleep"
         elif self.key == "Reboot":
             self.accel = "Re_boot"
-        self.button_width = (dialog_width / num_buttons) - self.button_spacing
         exit_log.debug("Setting button width to " + str(self.button_width))
         # initialize superclass EventBox
         super(ColoredImageButton, self).__init__()
@@ -82,8 +82,12 @@ class ColoredImageButton(gtk.EventBox):
         # Add the image_label box
         box = self.image_label_box(self.button_image, self.label)
 
-        # We have to add a little to height to account for the height of the labels.
-        box.set_size_request(self.button_width, self.button_height + self.label_height)
+        # Set the size of the custom "button"
+        # If labels are shown, increase this box size by theme_entries['label_height']
+        if self.show_labels:
+            box.set_size_request(self.button_width - self.button_spacing, self.button_height + self.label_height)
+        else:
+            box.set_size_request(self.button_width - self.button_spacing, self.button_height)
         self.add(box)
         # set events
         self.connect("button-release-event", self.clicked)
