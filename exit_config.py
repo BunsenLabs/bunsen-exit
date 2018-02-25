@@ -239,7 +239,8 @@ class Config(object):
                     or key == "overall_opacity" \
                     or key == "button_spacing" \
                     or key == "label_height" \
-                    or key == "font_size":
+                    or key == "font_size" \
+                    or key == "tooltip_font_size":
                 var_type = "int"
                 result = self.test_entry(key, value, var_type)
                 if not result:
@@ -253,7 +254,7 @@ class Config(object):
                     theme_entries[key] = str(value)
             # Test directory entry
             if key == "icon_path":
-                exit_log.debug("icon_path set to " + theme_entries[ key ] + ".")
+                exit_log.debug("icon_path set to " + theme_entries[key] + ".")
                 var_type = "dir"
                 result = self.test_entry(key, value, var_type)
                 if not result:

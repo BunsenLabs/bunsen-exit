@@ -24,15 +24,17 @@ class ColoredImageButton(gtk.EventBox):
         (dialog_width / num_buttons) - button_spacing.
         :param show_labels: whether to show/hide the labels.
         """
+        self.frame = gtk.Frame()
         self.key = key
         self.button_image = button_image
         self.theme_entries = theme_entries
         self.attr = pango.AttrList()
         self.show_labels = show_labels
+        self.button_spacing = int(self.theme_entries[ 'button_spacing' ])
         self.button_height = int(theme_entries['button_height'])
-        self.button_spacing = int(self.theme_entries['button_spacing'])
-        self.label_height = int(self.theme_entries['label_height'])
         self.button_width = (dialog_width / num_buttons) - self.button_spacing
+        self.label_height = int(self.theme_entries['label_height'])
+
         # Maps button keys to accelerators.
         if self.key == "Cancel":
             self.accel = "Cancel"
@@ -80,15 +82,21 @@ class ColoredImageButton(gtk.EventBox):
         # colorize the button upon init
         self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.theme_entries['button_background_normal']))
         # Add the image_label box
-        box = self.image_label_box(self.button_image, self.label)
+        custom_button = self.image_label_box(self.button_image, self.label)
 
         # Set the size of the custom "button"
         # If labels are shown, increase this box size by theme_entries['label_height']
         if self.show_labels:
-            box.set_size_request(self.button_width - self.button_spacing, self.button_height + self.label_height)
+            custom_button.set_size_request(self.button_width - self.button_spacing,
+                                           self.button_height + self.label_height)
+            self.frame.set_size_request(self.button_width - self.button_spacing,
+                                        self.button_height + self.label_height)
         else:
-            box.set_size_request(self.button_width - self.button_spacing, self.button_height)
-        self.add(box)
+            custom_button.set_size_request(self.button_width - self.button_spacing,
+                                           self.button_height)
+            self.frame.set_size_request(self.button_width - self.button_spacing,
+                                        self.button_height)
+        self.add(custom_button)
         # set events
         self.connect("button-release-event", self.clicked)
         self.connect("enter-notify-event", self.mouse_in)

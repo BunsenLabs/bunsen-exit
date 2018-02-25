@@ -1,6 +1,7 @@
 import pygtk
 pygtk.require('2.0')
 import gtk
+import pango
 import os
 import logging
 from colored_image_button import ColoredImageButton
@@ -301,6 +302,12 @@ class ExitGtk:
 
         """
         fg_color = self.theme_entries['tooltip_foreground']
+        tooltip_font = self.theme_entries['tooltip_font_family']
+        tooltip_font += " "
+        tooltip_font += self.theme_entries['tooltip_font_style']
+        tooltip_font += " "
+        tooltip_font += self.theme_entries['tooltip_font_size']
+        tooltip_label.modify_font(pango.FontDescription(tooltip_font))
         label_markup = '<span foreground="' + fg_color + '">' + key + '</span>'
         tooltip_label.set_markup(label_markup)
         tooltip_label.show()

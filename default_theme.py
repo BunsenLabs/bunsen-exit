@@ -40,15 +40,17 @@ class DefaultTheme:
         self.default_theme['window_background_normal'] = '#696969'
         self.default_theme['button_background_normal'] = '#696969'
         self.default_theme['button_background_prelight'] = '#838383'
+        self.default_theme['button_border_type'] = None
         self.default_theme['text_color_normal'] = '#000000'
         self.default_theme['text_color_prelight'] = '#ffffff'
         self.default_theme['tooltip_background'] = '#696969'
         self.default_theme['tooltip_foreground'] = '#000000'
-        self.default_theme['border_color'] = '#000040'
-        self.default_theme['font_family'] = "monospace"
-        self.default_theme['font_style'] = "bold"
-        self.default_theme['font_size'] = "8"
-
+        self.default_theme['font_family'] = "Noto Sans"
+        self.default_theme['font_style'] = "regular"
+        self.default_theme['font_size'] = "11"
+        self.default_theme['tooltip_font_family'] = "Noto Sans"
+        self.default_theme['tooltip_font_style'] = "regular"
+        self.default_theme['tooltip_font_size'] = "9"
         return
 
     def get_default_theme(self):

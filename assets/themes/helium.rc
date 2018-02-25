@@ -1,4 +1,3 @@
-
 # Helium Theme for the bunsen-exit dialog.
 # -*- coding: utf-8 -*-
 #    This is a fork of:
@@ -29,7 +28,7 @@
 # a gtk theme similar to that of #! set as your default, then remove or rename
 # the config file, located at: ~/.config/bunsen-exit/bl-exitrc
 
-#[theme] is mandatory
+# [theme] is mandatory
 
 # name - the name of the theme.
 # defaults to Unknown
@@ -77,6 +76,7 @@
 
 # Button textures (i.e. the images on them)
 # Map file names to button types similar to below.
+# When button images fail to load, an image from gtk.STOCK_DIALOG_ERROR is loaded instead.
 # button_image_cancel = cancel-sm.png
 # button_image_poweroff = poweroff-sm.png
 # button_image_reboot = reboot-sm.png
@@ -111,8 +111,6 @@
 # tooltip_foreground - the tooltip text color
 # Must use hexadecimal format. Defaults to #000000
 
-# border_color - Not implemented yet.
-
 # font_family - Sets the font family for labels, e.g. sans, serif, monospace
 # font_style - Sets the font style, e.g. bold, or bold, italic condensed
 # font_size - Sets the font size for font_labels.
@@ -125,12 +123,12 @@ author = BunsenLabs
 
 # Dialog
 window_width_adjustment = 0.50
-dialog_height = 70
-inner_border = 5
+dialog_height = 65
+inner_border = 3
 
 # Opacity
 sleep_delay = 0.003
-overall_opacity =
+overall_opacity = 90
 
 # Buttons
 button_height = 62
@@ -148,7 +146,7 @@ button_image_hibernate = hibernate-sm.png
 label_height = 20
 
 # Window Colors
-window_background_normal = #284F63
+window_background_normal = #082B4A
 
 # Button Backgrounds
 button_background_normal = #284F63
@@ -159,20 +157,17 @@ text_color_normal = #ffffff
 text_color_prelight = #000000
 
 # Tooltip Colors
-tooltip_background = #284F63
-tooltip_foreground = #00ffff
+tooltip_background = #082B4A
+tooltip_foreground = #ffffff
 
-# Border Color - TODO
-# border_color = #000040
-
-# Fonts
+# Button Label Font
 font_family = Noto Sans
 font_style = regular
 font_size = 11
 
-# Tooltip Fonts
-# tooltip_font_family - TODO
-# tooltip_font_style - TODO
-# tool_tip_font_size - TODO
+# Tooltip Font
+tooltip_font_family = Noto Sans
+tooltip_font_style = regular
+tooltip_font_size = 11
 
 
