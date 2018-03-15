@@ -1,2 +1,2 @@
-include README.rst
-include assets/*
+recursive-include bunsen-exit *.py
+recursive-include bunsen-exit/assets *.*
