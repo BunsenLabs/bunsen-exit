@@ -161,15 +161,12 @@ text_color_prelight = #ffffff
 tooltip_background = #3c3c3c
 tooltip_foreground = #ffffff
 
-# Border Color - TODO
-# border_color = #000040
-
 # Fonts
 font_family = Noto Sans
 font_style = regular
 font_size = 11
 
 # Tooltip Fonts
-# tooltip_font_family - TODO
-# tooltip_font_style - TODO
-# tool_tip_font_size - TODO
+tooltip_font_family = Noto Sans
+tooltip_font_style = regular
+tool_tip_font_size = 11
