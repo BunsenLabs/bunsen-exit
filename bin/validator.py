@@ -90,12 +90,16 @@ class Validator:
         default_dict = theme_defaults.get_default_theme()
         for key, value in default_dict.iteritems():
             if key not in theme_entries:
-                exit_log.warn("<KEY ERROR>: " + key + " does not exist in config file.")
-                exit_log.warn("Setting key[" + key + "] to default value " + str(value) + ".")
+                msg = "<KEY ERROR>: " + key + " does not exist in config file."
+                exit_log.warn(msg)
+                msg = "Setting key [" + key + "] to default value " + str(value) + "."
+                exit_log.warn(msg)
                 theme_entries[key] = value
             if theme_entries[key] == "" or theme_entries[key] is None:
                 # Value does not exist so plug in a default
-                exit_log.warn("Value does not exist for key " + key + ".")
-                exit_log.warn("Setting default to " + str(value) + ".")
+                msg = "Value does not exist for key " + key + "."
+                exit_log.warn(msg)
+                msg = "Setting default to " + str(value) + "."
+                exit_log.warn(msg)
                 theme_entries[key] = str(value)
         return theme_entries

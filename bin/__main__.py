@@ -34,6 +34,8 @@ import collections
 import validator
 
 DISPLAY = os.environ.get('DISPLAY') is not None
+exit_log = logging.getLogger('Bunsen-Exit-Log')
+
 
 def get_options():
     """
@@ -57,7 +59,6 @@ def get_options():
                         action="store", dest="logfile", default="None")
     parser.add_argument("-z", "--loglevel", help="Verbosity of the logging, Info, Warn, or Debug",
                         action="store", dest="loglevel", default="None")
-    print (parser.parse_args())
     args = parser.parse_args()
     return args
 
