@@ -13,8 +13,8 @@ style "button"
 {
 # This shows all the possible states for a button.  
   
-    bg[ACTIVE] = '#73919C'
-    bg[PRELIGHT] = '#678B8B'
+    bg[ACTIVE] = '#3D7B99'
+    bg[PRELIGHT] = '#2D5A70'
 
 }
 
