@@ -35,9 +35,6 @@ import validator
 
 DISPLAY = os.environ.get('DISPLAY') is not None
 
-exit_log = logging.getLogger('Bunsen-Exit-Log')
-
-
 def get_options():
     """
     The command line interface's argument parser.

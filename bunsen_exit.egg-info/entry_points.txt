@@ -1,3 +1,0 @@
-[console_scripts]
-bl-exit = bin.__main__:main
-
