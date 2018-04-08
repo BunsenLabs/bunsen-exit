@@ -1,0 +1,28 @@
+#   CONFIGURATION
+#   --------------
+#
+#   Full instructions for configuring bl-exitrc can be found in: 
+#
+#      "/usr/share/bunsen/docs/helpfile-bl-exit.txt"
+#
+#   They can also be accessed from the main menu:
+#
+#       Menu -> Help & Resources -> Bunsen Help Files
+#
+#
+### BUTTONS ############################################################
+[button_values]
+Cancel = show
+Logout = show
+Suspend = show
+Reboot = show
+PowerOff = show
+Hibernate = show
+HybridSleep = show
+
+# Set the directory and file for the theme
+# If one cannot be found, then the default gtk theme will be used.
+[theme]
+dir = themes
+rcfile = helium.rc
+name = helium
