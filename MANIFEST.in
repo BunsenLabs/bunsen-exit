@@ -1,0 +1,2 @@
+recursive-include bunsen-exit *.py
+recursive-include bunsen-exit/assets *.*
