@@ -118,23 +118,23 @@ If this path cannot be found, then the dialog will fall back to a default gtk di
   **Labels**
    
 
-	label_height	Additional height to add to the dialog when <Shift> is pressed and button labels are shown. 
+	label_height	Additional height to add to the dialog when button labels are shown. 
 		Increase this value for larger fonts or fonts with odd ascenders/descenders that end up clipped. 
-		Defaults to 20. 
-		Must be an int.
+			Defaults to 20. 
+			Must be an int.
 **Window Colors**
    
 
-	 window_background_normal		The color of the dialog window. 
-							Must use hexadecimal color format. 
-							Defaults to #838383.
+	 window_background_normal	The color of the dialog window. 
+						Must use hexadecimal color format. 
+						Defaults to #838383.
 **Button Colors**
   
 
-	  button_background_normal		The normal color of the button. 
-							Must use hexadecimal format. 
-							Defaults to #838383.
-	  button_background_prelight	the highlighted color of the button. 
+	  button_background_normal	The normal color of the button. 
+						Must use hexadecimal format. 
+						Defaults to #838383.
+	  button_background_prelight	The highlighted color of the button. 
 							Must use hexadecimal format. 
 							Defaults to #c1c1c1.
 **Text Colors**
