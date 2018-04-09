@@ -120,53 +120,53 @@ If this path cannot be found, then the dialog will fall back to a default gtk di
    
 
 	label_height	Additional height to add to the dialog when button labels are shown. 
-				Increase this value for larger fonts or fonts that end up clipped. 
-				Defaults to 20. 
-				Must be an int.
+			Increase this value for larger fonts or fonts that end up clipped. 
+			Defaults to 20. 
+			Must be an int.
 **Window Colors**
    
 
-	 window_background_normal	The color of the dialog window. 
-						Must use hexadecimal color format. 
-						Defaults to #838383.
+	window_background_normal	The color of the dialog window. 
+					Must use hexadecimal color format. 
+					Defaults to #838383.
 **Button Colors**
   
 
-	  button_background_normal	The normal color of the button. 
-						Must use hexadecimal format. 
-						Defaults to #838383.
+	button_background_normal	The normal color of the button. 
+					Must use hexadecimal format. 
+					Defaults to #838383.
 	  button_background_prelight	The highlighted color of the button. 
-							Must use hexadecimal format. 
-							Defaults to #c1c1c1.
+						Must use hexadecimal format. 
+						Defaults to #c1c1c1.
 **Text Colors**
    
 
-	 text_color_normal		The normal text color for labels. 
-					Must use hexadecimal format.
-					Defaults to #d9d9d9.
+	text_color_normal	The normal text color for labels. 
+				Must use hexadecimal format.
+				Defaults to #d9d9d9.
 	 text_color_prelight	The highlighted text color of labels. 
-					Must use hexadecimal format.
-					Defaults to #d9d9d9.
+				Must use hexadecimal format.
+				Defaults to #d9d9d9.
 **Tooltip Colors**
    
 
-	 tooltip_background		The color of tooltip backgrounds.
-					Must use hexadecimal format.
-					Defaults to #c1c1c1.
-	 tooltip_foreground		The tooltip text color. 
-					Must use hexadecimal format.
-					Defaults to #000000.
+	 tooltip_background	The color of tooltip backgrounds.
+				Must use hexadecimal format.
+				Defaults to #c1c1c1.
+	 tooltip_foreground	The tooltip text color. 
+				Must use hexadecimal format.
+				Defaults to #000000.
 **Button Label Font**
 
-		font_family		Sets the font family for labels, e.g. sans, serif, monospace. 
-		font_style		Sets the font style, e.g. bold, or bold italic.
-		font_size		Sets the font size for font_labels.
+		font_family	Sets the font family for labels, e.g. sans, serif, monospace. 
+		font_style	Sets the font style, e.g. bold, or bold italic.
+		font_size	Sets the font size for font_labels.
 **Tooltip Font**
    
 
 	 tooltip_font_family	Sets the font family for tooltips
-					Defaults to Noto Sans
+				Defaults to Noto Sans
 		tooltip_font_style	Sets the font style for tooltips, e.g. bold or regular
-					Defaults to regular.
+				Defaults to regular.
 		tooltip_font_size	Sets the font size for tooltips.
-					Defaults to 9.
+				Defaults to 9.
