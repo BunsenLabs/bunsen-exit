@@ -135,7 +135,7 @@ If this path cannot be found, then the dialog will fall back to a default gtk di
 	button_background_normal	The normal color of the button. 
 					Must use hexadecimal format. 
 					Defaults to #838383.
-	  button_background_prelight	The highlighted color of the button. 
+	button_background_prelight	The highlighted color of the button. 
 						Must use hexadecimal format. 
 						Defaults to #c1c1c1.
 **Text Colors**
@@ -144,7 +144,7 @@ If this path cannot be found, then the dialog will fall back to a default gtk di
 	text_color_normal	The normal text color for labels. 
 				Must use hexadecimal format.
 				Defaults to #d9d9d9.
-	 text_color_prelight	The highlighted text color of labels. 
+	text_color_prelight	The highlighted text color of labels. 
 				Must use hexadecimal format.
 				Defaults to #d9d9d9.
 **Tooltip Colors**
