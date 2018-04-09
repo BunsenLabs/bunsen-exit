@@ -66,39 +66,38 @@ This is the previous set of defaults used in Bunsenlabs Hydrogen.
 **Dialog**
 
      window_width adjustment	Percentage of the screen the dialog window should occupy. 
-									Must resolve to a float. 
-									Defaults to 0.50 
-									Scale factor for window_width_adjustment 
-									( 0 = default, 800px; 1 = full screen)
+						Must resolve to a float. 
+						Defaults to 0.50 
+						Scale factor for window_width_adjustment 
+						( 0 = default, 800px; 1 = full screen)
      dialog_height			The height of the dialog window. 
-									Must be resolve to an int. 
-									Defaults to 64.
+						Must be resolve to an int. 
+						Defaults to 64.
   **Opacity**
    
      sleep_delay		Delay for the fade in counter. 
-							This allows the dialog to fade into view.
-							Must resolve to a float. 
-							Defaults to 0.001.
+				This allows the dialog to fade into view.
+				Must resolve to a float. 
+				Defaults to 0.001.
 	 overall_opacity	Opacity of the dialog from (0 - 100)
-						0 is transparent. 100 is opaque. 
-						Must resolve to an int. 
-						Defaults to 100.
+			0 is transparent. 100 is opaque. 
+			Must resolve to an int. 
+			Defaults to 100.
 **Buttons**
   
 
       button_height		The height of the custom buttons.
-							Must resolve to an int.
-							Defaults to 64.  
+				Must resolve to an int.
+				Defaults to 64.  
 NOTE: values of less than 60 tend to create clipping on the labels. Similarly, values larger than the dialog_height will create clipping.
 
         inner_border	Specifies the size of the horizontal container that the buttons get packed into. 
-						Must resolve to an int. 
-						Defaults to 0.
+			Must resolve to an int. 
+			Defaults to 0.
 Useful to create a thin inner border between the dialog and that container.  Large values may create clipping. 
-					        
         button_spacing	The spacing between the buttons. 
-						Must resolve to an int. 
-						Defaults to 0.
+			Must resolve to an int. 
+			Defaults to 0.
         icon_path		The path to the images you want to map to the buttons. 
    If this path cannot be found, then the dialog will fall back to a default gtk dialog.
    
@@ -114,45 +113,43 @@ Useful to create a thin inner border between the dialog and that container.  Lar
   **Labels**
    
 
-	label_height	Additional height to add to the dialog when <Shift> 
-					is pressed and button labels are shown. 
-					Increase this value for larger fonts or fonts
-					with odd ascenders/descenders that end up clipped. 
-						Defaults to 20. 
-						Must be an int.
+	label_height	Additional height to add to the dialog when <Shift> is pressed and button labels are shown. 
+		Increase this value for larger fonts or fonts with odd ascenders/descenders that end up clipped. 
+		Defaults to 20. 
+		Must be an int.
 **Window Colors**
    
 
      window_background_normal		The color of the dialog window. 
-			    						Must use hexadecimal color format. 
-	    								Defaults to #838383.
+			    			Must use hexadecimal color format. 
+	    					Defaults to #838383.
 **Button Colors**
   
 
       button_background_normal		The normal color of the button. 
-									  Must use hexadecimal format. 
-								      Defaults to #838383.
+							Must use hexadecimal format. 
+							Defaults to #838383.
       button_background_prelight	the highlighted color of the button. 
-								      Must use hexadecimal format. 
-								      Defaults to #c1c1c1.
+							Must use hexadecimal format. 
+							Defaults to #c1c1c1.
 **Text Colors**
    
 
      text_color_normal		The normal text color for labels. 
-			    				Must use hexadecimal format.     																		    												
-			    				Defaults to #d9d9d9.
+			    	Must use hexadecimal format.
+			    	Defaults to #d9d9d9.
      text_color_prelight	The highlighted text color of labels. 
-								Must use hexadecimal format.
-								Defaults to #d9d9d9.
+					Must use hexadecimal format.
+					Defaults to #d9d9d9.
 **Tooltip Colors**
    
 
      tooltip_background		The color of tooltip backgrounds.
-								Must use hexadecimal format.
-								Defaults to #c1c1c1.
+					Must use hexadecimal format.
+					Defaults to #c1c1c1.
      tooltip_foreground		The tooltip text color. 
-								Must use hexadecimal format.
-								Defaults to #000000.
+					Must use hexadecimal format.
+					Defaults to #000000.
 **Button Label Font**
 
 		font_family		Sets the font family for labels, e.g. sans, serif, monospace. 
@@ -162,8 +159,8 @@ Useful to create a thin inner border between the dialog and that container.  Lar
    
 
      tooltip_font_family	Sets the font family for tooltips
-								Defaults to Noto Sans
+					Defaults to Noto Sans
         tooltip_font_style	Sets the font style for tooltips, e.g. bold or regular
-								Defaults to regular.
+					Defaults to regular.
         tooltip_font_size	Sets the font size for tooltips.
-								Defaults to 9.
+					Defaults to 9.
