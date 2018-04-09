@@ -61,9 +61,9 @@ This is the previous set of defaults used in Bunsenlabs Hydrogen.
 **Meta Data**
 	
 	 name	The name of the theme.
-		Defaults to Unknown 
+			Defaults to Unknown 
 	 author	The author of the theme.
-		Defaults to Unknown
+			Defaults to Unknown
   
 **Dialog**
 
@@ -82,24 +82,29 @@ This is the previous set of defaults used in Bunsenlabs Hydrogen.
 					Must resolve to a float. 
 					Defaults to 0.001.
 
-	 overall_opacity	Opacity of the dialog from (0 - 100)
-					0 is transparent. 100 is opaque. 
-					Must resolve to an int. 
-					Defaults to 100.
+	 overall_opacity		Opacity of the dialog from (0 - 100)
+						0 is transparent. 100 is opaque. 
+						Must resolve to an int. 
+						Defaults to 100.
 **Buttons**
+
 	button_height		The height of the custom buttons.
 					Must resolve to an int.
-					Defaults to 64.  
+					Defaults to 64.
+  
 NOTE: values of less than 60 tend to create clipping on the labels. Similarly, values larger than the dialog_height will create clipping.
-inner_border	The size of the horizontal container that the buttons get packed into. 
+
+	inner_border	The size of the horizontal container that the buttons get packed into. 
 				Must resolve to an int. 
 				Defaults to 0.
 Useful to create a thin inner border between the dialog and that container. Large values may create clipping.
+
 	button_spacing	The spacing between the buttons. 
 					Must resolve to an int. 
 					Defaults to 0.
-	icon_path		The path to the images you want to map to the buttons. 
-   If this path cannot be found, then the dialog will fall back to a default gtk dialog.
+	icon_path		The path to the images you want to map to the buttons.
+ 
+If this path cannot be found, then the dialog will fall back to a default gtk dialog.
    
    Button textures (i.e. the images on them) Map file names to button types similar to below. When button images fail to load, an image from gtk.STOCK_DIALOG_ERROR is loaded instead. 			
 
