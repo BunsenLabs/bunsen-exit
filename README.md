@@ -9,14 +9,14 @@ In a non-graphical environment, one of the accepted actions must be specified as
 
 **USAGE:**  
 
-     -l | --logout		Logs the user out.
+     -l 	| --logout		Logs the user out.
      -s	| --suspend  	Suspend the system.
      -i	| --hibernate	Hibernate the system.
      -y	| --hybridsleep	Hybrid sleep the system.
      -b	| --reboot		Reboot the system.
      -p	| --poweroff	Power off the system.
      -f	| --logfile		Which file to log too, e.g. ~/bl-exit.log or ~/.xsession-errors
-     -z | --loglevel	The default logging level can be one of:
+     -z 	| --loglevel	The default logging level can be one of:
                   			None - Logging turned off or sent to /dev/null
                   			Info - only log [INFO] messages.
 	                  		Warn - log [WARN] and [INFO] messages.
