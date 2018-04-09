@@ -17,10 +17,10 @@ In a non-graphical environment, one of the accepted actions must be specified as
 	-p	--poweroff	Power off the system.
 	-f	--logfile	Which file to log too, e.g. ~/bl-exit.log or ~/.xsession-errors
 	-z	--loglevel	The default logging level can be one of:
-				* None - Logging turned off or sent to /dev/null
-				* Info - only log [INFO] messages.
-				* Warn - log [WARN] and [INFO] messages.
-				* Debug - log all messages.
+					* None - Logging turned off or sent to /dev/null
+					* Info - only log [INFO] messages.
+					* Warn - log [WARN] and [INFO] messages.
+					* Debug - log all messages.
 When designing themes for the exit dialog, I would recommend that the loglevel be set to at least Warn and send the logs into their own file such as ~/bl-exit.log. The logfile defaults to ~/xsession-errors. With the loglevel set to None, logs will be sent to /dev/null. However, the console handler will still print messages to the console. Note that the Debug option is pretty verbose but does display all the program's inputs and outputs. 
 ## Configuration:
 
@@ -60,8 +60,10 @@ This is the previous set of defaults used in Bunsenlabs Hydrogen.
 [theme] is mandatory. Please do not remove it. 
 **Meta Data**
 	
-	 name	The name of the theme. Defaults to Unknown 
-	 author	The author of the theme. Defaults to Unknown
+	 name	The name of the theme.
+		Defaults to Unknown 
+	 author	The author of the theme.
+		Defaults to Unknown
   
 **Dialog**
 
