@@ -88,15 +88,15 @@ This is the previous set of defaults used in Bunsenlabs Hydrogen.
 						Defaults to 100.
 **Buttons**
 
-	button_height		The height of the custom buttons.
-					Must resolve to an int.
-					Defaults to 64.
+	button_height			The height of the custom buttons.
+						Must resolve to an int.
+						Defaults to 64.
   
 NOTE: values of less than 60 tend to create clipping on the labels. Similarly, values larger than the dialog_height will create clipping.
 
-	inner_border	The size of the horizontal container that the buttons get packed into. 
-				Must resolve to an int. 
-				Defaults to 0.
+	inner_border			The size of the horizontal container that the buttons get packed into. 
+						Must resolve to an int. 
+						Defaults to 0.
 Useful to create a thin inner border between the dialog and that container. Large values may create clipping.
 
 	button_spacing	The spacing between the buttons. 
@@ -106,7 +106,7 @@ Useful to create a thin inner border between the dialog and that container. Larg
  
 If this path cannot be found, then the dialog will fall back to a default gtk dialog.
    
-   Button textures (i.e. the images on them) Map file names to button types similar to below. When button images fail to load, an image from gtk.STOCK_DIALOG_ERROR is loaded instead. 			
+   Button textures (i.e. the images on them) Map file names to button types similar to below. When button images fail to load, an image from gtk.STOCK_DIALOG_ERROR is loaded instead.
 
 	button_image_cancel = cancel-sm.png
 	button_image_poweroff = poweroff-sm.png
