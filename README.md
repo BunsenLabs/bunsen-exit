@@ -150,23 +150,23 @@ If this path cannot be found, then the dialog will fall back to a default gtk di
 **Tooltip Colors**
    
 
-	 tooltip_background	The color of tooltip backgrounds.
+	tooltip_background	The color of tooltip backgrounds.
 				Must use hexadecimal format.
 				Defaults to #c1c1c1.
-	 tooltip_foreground	The tooltip text color. 
+	tooltip_foreground	The tooltip text color. 
 				Must use hexadecimal format.
 				Defaults to #000000.
 **Button Label Font**
 
-		font_family	Sets the font family for labels, e.g. sans, serif, monospace. 
-		font_style	Sets the font style, e.g. bold, or bold italic.
-		font_size	Sets the font size for font_labels.
+	font_family	Sets the font family for labels, e.g. sans, serif, monospace. 
+	font_style	Sets the font style, e.g. bold, or bold italic.
+	font_size	Sets the font size for font_labels.
 **Tooltip Font**
    
 
-	 tooltip_font_family	Sets the font family for tooltips
+	tooltip_font_family	Sets the font family for tooltips
 				Defaults to Noto Sans
-		tooltip_font_style	Sets the font style for tooltips, e.g. bold or regular
+	tooltip_font_style	Sets the font style for tooltips, e.g. bold or regular
 				Defaults to regular.
-		tooltip_font_size	Sets the font size for tooltips.
+	tooltip_font_size	Sets the font size for tooltips.
 				Defaults to 9.
