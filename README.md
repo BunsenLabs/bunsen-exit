@@ -79,19 +79,19 @@ This is the previous set of defaults used in Bunsenlabs Hydrogen.
 **Opacity**
 
 	sleep_delay		Delay for the fade in counter. 
-					This allows the dialog to fade into view.
-					Must resolve to a float. 
-					Defaults to 0.001.
+				This allows the dialog to fade into view.
+				Must resolve to a float. 
+				Defaults to 0.001.
 
 	 overall_opacity		Opacity of the dialog from (0 - 100)
-						0 is transparent. 100 is opaque. 
-						Must resolve to an int. 
-						Defaults to 100.
+					0 is transparent. 100 is opaque. 
+					Must resolve to an int. 
+					Defaults to 100.
 **Buttons**
 
 	button_height			The height of the custom buttons.
-						Must resolve to an int.
-						Defaults to 64.
+					Must resolve to an int.
+					Defaults to 64.
   
 NOTE: values of less than 60 tend to create clipping on the labels. Similarly, values larger than the dialog_height will create clipping.
 
