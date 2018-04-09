@@ -66,23 +66,24 @@ This is the previous set of defaults used in Bunsenlabs Hydrogen.
 **Dialog**
 
      window_width adjustment	Percentage of the screen the dialog window should occupy. 
-						Must resolve to a float. 
-						Defaults to 0.50 
-						Scale factor for window_width_adjustment 
-						( 0 = default, 800px; 1 = full screen)
+					Must resolve to a float. 
+					Defaults to 0.50 
+					Scale factor for window_width_adjustment 
+					( 0 = default, 800px; 1 = full screen)
      dialog_height			The height of the dialog window. 
-						Must be resolve to an int. 
-						Defaults to 64.
+					Must be resolve to an int. 
+					Defaults to 64.
   **Opacity**
    
      sleep_delay		Delay for the fade in counter. 
-				This allows the dialog to fade into view.
-				Must resolve to a float. 
-				Defaults to 0.001.
+					This allows the dialog to fade into view.
+					Must resolve to a float. 
+					Defaults to 0.001.
+
 	 overall_opacity	Opacity of the dialog from (0 - 100)
-			0 is transparent. 100 is opaque. 
-			Must resolve to an int. 
-			Defaults to 100.
+					0 is transparent. 100 is opaque. 
+					Must resolve to an int. 
+					Defaults to 100.
 **Buttons**
   
 
