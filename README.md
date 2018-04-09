@@ -99,10 +99,10 @@ NOTE: values of less than 60 tend to create clipping on the labels. Similarly, v
 						Defaults to 0.
 Useful to create a thin inner border between the dialog and that container. Large values may create clipping.
 
-	button_spacing	The spacing between the buttons. 
-					Must resolve to an int. 
-					Defaults to 0.
-	icon_path		The path to the images you want to map to the buttons.
+	button_spacing			The spacing between the buttons. 
+							Must resolve to an int. 
+							Defaults to 0.
+	icon_path				The path to the images you want to map to the buttons.
  
 If this path cannot be found, then the dialog will fall back to a default gtk dialog.
    
