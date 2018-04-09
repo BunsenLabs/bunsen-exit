@@ -148,7 +148,7 @@ label_height = 20
 # Window Colors
 window_background_normal = #082B4A
 
-# Button Backgrounds
+# Button Colors
 button_background_normal = #284F63
 button_background_prelight = #678B8B
 
