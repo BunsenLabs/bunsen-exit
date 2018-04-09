@@ -61,22 +61,23 @@ This is the previous set of defaults used in Bunsenlabs Hydrogen.
 **Meta Data**
 	
 	 name	The name of the theme.
-			Defaults to Unknown 
+		Defaults to Unknown 
 	 author	The author of the theme.
-			Defaults to Unknown
-  
+		Defaults to Unknown
+
 **Dialog**
 
 	 window_width adjustment	Percentage of the screen the dialog window should occupy. 
-						Must resolve to a float. 
-						Defaults to 0.50 
-						Scale factor for window_width_adjustment 
-						( 0 = default, 800px; 1 = full screen)
+					Must resolve to a float. 
+					Defaults to 0.50 
+					Scale factor for window_width_adjustment 
+					( 0 = default, 800px; 1 = full screen)
 
 	 dialog_height			The height of the dialog window. 
-						Must be resolve to an int. 
-						Defaults to 64.
-  **Opacity**
+					Must be resolve to an int. 
+					Defaults to 64.
+**Opacity**
+
 	sleep_delay		Delay for the fade in counter. 
 					This allows the dialog to fade into view.
 					Must resolve to a float. 
@@ -120,8 +121,8 @@ If this path cannot be found, then the dialog will fall back to a default gtk di
 
 	label_height	Additional height to add to the dialog when button labels are shown. 
 				Increase this value for larger fonts or fonts that end up clipped. 
-					Defaults to 20. 
-					Must be an int.
+				Defaults to 20. 
+				Must be an int.
 **Window Colors**
    
 
