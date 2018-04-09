@@ -119,9 +119,9 @@ If this path cannot be found, then the dialog will fall back to a default gtk di
    
 
 	label_height	Additional height to add to the dialog when button labels are shown. 
-		Increase this value for larger fonts or fonts with odd ascenders/descenders that end up clipped. 
-			Defaults to 20. 
-			Must be an int.
+				Increase this value for larger fonts or fonts that end up clipped. 
+					Defaults to 20. 
+					Must be an int.
 **Window Colors**
    
 
