@@ -1,3 +1,9 @@
+bunsen-exit (9.1.4-1) helium; urgency=medium
+
+  * Restore "grey" style, it is used in some BLOB themes.
+
+ -- John Crawley <john@bunsenlabs.org>  Wed, 25 Apr 2018 17:16:30 +0900
+
 bunsen-exit (9.1.3-1) helium; urgency=medium
 
   * Adjust "helium" style colours slightly.
