@@ -1,5 +1,5 @@
-bin usr
-bl-exitrc etc/bl-exit/
-styles etc/bl-exit/
-dark usr/share/images/bunsen/exit/
-light usr/share/images/bunsen/exit/
+assets/dark/*.png usr/share/images/bunsen/exit/dark
+assets/light/*.png usr/share/images/bunsen/exit/light
+assets/themes etc/bunsen-exit
+assets/bl-exitrc etc/bunsen-exit
+
