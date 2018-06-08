@@ -43,7 +43,7 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'bl-exit = bin.__main__:main',
+            'bl-exit = bunsen_exit.__main__:main',
         ]
     },
     url="https://github.com/BunsenLabs/bunsen-exit",

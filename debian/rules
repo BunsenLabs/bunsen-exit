@@ -3,8 +3,7 @@
 # output every command that modifies files on the build system.
 DH_VERBOSE = 1
 
-export PYBUILD_NAME = bunsen-exit==3.0.0rc1
-#export PYBUILD_INSTALL_ARGS=--install-lib=/usr/lib/python2.7/dist-packages/bunsen-exit
+export PYBUILD_NAME = bunsen-exit
 
 # main packaging script based on dh7 syntax
 %:
