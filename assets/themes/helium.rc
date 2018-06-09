@@ -111,6 +111,8 @@
 # tooltip_foreground - the tooltip text color
 # Must use hexadecimal format. Defaults to #000000
 
+# border_color - Not implemented yet.
+
 # font_family - Sets the font family for labels, e.g. sans, serif, monospace
 # font_style - Sets the font style, e.g. bold, or bold, italic condensed
 # font_size - Sets the font size for font_labels.

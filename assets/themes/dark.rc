@@ -1,4 +1,4 @@
-# Helium Theme for the bunsen-exit dialog.
+# Dark Theme for the bunsen-exit dialog.
 # -*- coding: utf-8 -*-
 #    This is a fork of:
 #    bl-exit: Bunsenlabs exit dialog, offering various exit options
@@ -28,7 +28,7 @@
 # a gtk theme similar to that of #! set as your default, then remove or rename
 # the config file, located at: ~/.config/bunsen-exit/bl-exitrc
 
-#[theme] is mandatory
+# [theme] is mandatory
 
 # name - the name of the theme.
 # defaults to Unknown
@@ -76,6 +76,7 @@
 
 # Button textures (i.e. the images on them)
 # Map file names to button types similar to below.
+# When button images fail to load, an image from gtk.STOCK_DIALOG_ERROR is loaded instead.
 # button_image_cancel = cancel-sm.png
 # button_image_poweroff = poweroff-sm.png
 # button_image_reboot = reboot-sm.png
@@ -125,7 +126,6 @@ author=MerlinElMago
 # Dialog
 window_width_adjustment = 1
 dialog_height = 100
-button_height = 95
 inner_border = 5
 
 # Opacity
@@ -133,6 +133,7 @@ sleep_delay = 0.003
 overall_opacity = 100
 
 # Buttons
+button_height = 95
 button_spacing = 5
 icon_path = /usr/share/images/bunsen/exit/dark
 button_image_cancel = cancel.png
@@ -161,13 +162,14 @@ text_color_prelight = #ffffff
 tooltip_background = #3c3c3c
 tooltip_foreground = #ffffff
 
-# Fonts
+# Button Label Font
 font_family = Noto Sans
 font_style = regular
 font_size = 11
 
-# Tooltip Fonts
+# Tooltip Font
 tooltip_font_family = Noto Sans
 tooltip_font_style = regular
-tool_tip_font_size = 11
+tooltip_font_size = 11
+
 
