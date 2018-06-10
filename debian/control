@@ -10,7 +10,7 @@ Vcs-Browser: https://github.com/BunsenLabs/bunsen-exit.git
 
 Package: bunsen-exit
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}
+Depends: ${misc:Depends}, ${python:Depends}, python-gtk2
 Recommends: light-locker, systemd
 Replaces: bunsen-utilities (<<9.2-1)
 Breaks: bunsen-utilities (<<9.2-1)
