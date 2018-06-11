@@ -1,4 +1,4 @@
-bunsen-exit (9.2-1~test3) UNRELEASED; urgency=medium
+bunsen-exit (9.2-1~test3) helium; urgency=medium
 
   * assets/themes: resolve some inconsistencies
   * debian/rules: comment out verbosity
