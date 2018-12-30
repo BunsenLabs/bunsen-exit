@@ -1,3 +1,11 @@
+bunsen-exit (10.0-1) lithium; urgency=medium
+
+  * Migrate to Lithium.
+  * Raise debhelper (10) and standards (4.3.0) versions.
+  * Remove dh-systemd from Build-Depends (now provided by debhelper).
+
+ -- John Crawley <john@bunsenlabs.org>  Sun, 30 Dec 2018 16:32:49 +0900
+
 bunsen-exit (9.1.4-1) helium; urgency=medium
 
   * Restore "grey" style, it is used in some BLOB themes.
