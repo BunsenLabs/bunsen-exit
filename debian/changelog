@@ -1,3 +1,9 @@
+bunsen-exit (10.0-2~test) lithium; urgency=medium
+
+  * Allow elogind as dependency instead of systemd.
+
+ -- John Crawley <john@bunsenlabs.org>  Wed, 09 Jan 2019 17:53:52 +0900
+
 bunsen-exit (10.0-1) lithium; urgency=medium
 
   * Migrate to Lithium.
