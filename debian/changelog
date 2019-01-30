@@ -1,4 +1,4 @@
-bunsen-exit (10.0-3) lithium; urgency=medium
+bunsen-exit (10.0-2) lithium; urgency=medium
 
   * Allow elogind as alternative dependency instead of systemd.
 
