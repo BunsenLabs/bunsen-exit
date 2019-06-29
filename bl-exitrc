@@ -1,5 +1,7 @@
 #   CONFIGURATION
 #   --------------
+# NOTE: This file is only parsed by the legacy version of bl-exit,
+# installed by the bunsen-exit-legacy package.
 #
 #   Full instructions for configuring bl-exitrc can be found in: 
 #

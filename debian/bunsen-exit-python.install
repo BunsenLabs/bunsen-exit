@@ -1,0 +1,4 @@
+bin-python/* usr/bin
+bl-exitrc etc/bl-exit/
+styles etc/bl-exit/
+img/* usr/share/images/bunsen/exit/

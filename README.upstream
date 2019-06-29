@@ -1,0 +1,564 @@
+NOTE
+This is the original bl-exit script provided by MXStuff.org,
+which has been modified for BunsenLabs, and shipped as
+/usr/bin/bl-exit.
+
+The code in this file is provided for reference,
+but is not supported as-is by BunsenLabs.
+
+See 'bl-exit --help' or 'man bl-exit' for information about the
+BunsenLabs implementation.
+
+########################################################################
+#!/usr/bin/env bash
+
+########################################################################
+##                                                                    ##
+## Init and desktop agnostic "yad" based Logout/Exit dialogue.        ##
+##                                                                    ##
+## Written in response to the seeimingly widely held belief that      ##
+## 'systemctl' is what you _have_ to use for power operations if you  ##
+## have systemd, regardless that dbus calls are arguably superior.    ##
+##                                                                    ##
+## Since systemd users like systemd specific commands so much, here's ##
+## a system exit dialogue that uses systemd's calls for every power   ##
+## or session control action, while remaining compatible with         ##
+## non-systemd systems.                                               ##
+##                                                                    ##
+## Originally written for Bunsenlabs "Lithium" by Bearded_Blunder     ##
+## <init.choice@mxstuff.org> February 2019                            ##
+##                                                                    ##
+## Copyright © 2019 MXStuff.org <init.choice@mxstuff.org>             ##
+##                                                                    ##
+## This program is free software. It comes without any warranty, to   ##
+## the extent permitted by applicable law. You can redistribute it    ##
+## and/or modify it under the terms of the Do What The Fuck You Want  ##
+## To Public License, Version 2, as published by Sam Hocevar. See     ##
+## http://www.wtfpl.net/ for more details.                            ##
+##                                                                    ##
+########################################################################
+
+########################################################################
+#       Config block begins. Copy & paste block to config file.        #
+#       Parser expects a file in any of these locations:               #
+#       Vendor: Config added by "vendors" (eg BL).                     #
+#              /usr/share/bunsen/conf.d/bl-exit.conf                   #
+#       Local Administrator: Settings added by sysadmins               #
+#              /etc/bl-exit/bl-exit.conf                               #
+#       User Settings: Individual preferences.                         #
+#              ~/.config/bunsen/bl-exit.conf                           #
+#                                                                      #
+#  NOTE: These files are not needed for operation, though at least one #
+#        is required to edit settings with the --config-system or      #
+#        --config arguments, when present they are read in the order   #
+#        listed, and settings from the last file read take precedence, #
+#        the resulting behaviour is the cumulative total of changes in #
+#        each file in order, relative to the defaults in this script.  #
+#                                                                      #
+#        --configure-system                                            #
+#            Will open /etc/bl-exit/bl-exit.conf if present or copy    #
+#            /usr/share/bunsen/conf.d/bl-exit.conf to /etc/bl-exit/    #
+#            then open it. If neither exist it will fail.              #
+#                                                                      #
+#        --configure                                                   #
+#            Will check if ~/.config/bl-exit/bl-exit.conf exists and   #
+#            open it for editing. If it does not it will try to copy   #
+#            first /etc/bl-exit/bl-exit.conf then                      #
+#            /usr/share/bunsen/conf.d/bl-exit.conf and open the copy   #
+#            for editing. If no file exists it will fail.              #
+#                                                                      #
+########################################################################
+
+# Default interface with no arguments see `bl-exit --help` for options.
+# Specifying a non-graphical option such as --reboot here is silly.
+DEFAULT_MODE="--vertical"
+
+## Strings and Icons - These blocks make local translation easier ##
+
+# Globally, except "icon" interface, button text/keyboard accelerators leading _underscore defines alt+key accelerator.
+# Default accelerators except for "Cancel" correspond with the short command line arguments for that specific action.
+# Colours and fonts can be specified. Example:
+# For BL-Moonlight obconf tells me things are using "Sans" `fc-match Sans` says "Noto Sans" so I've specified
+# 'Noto Sans Mono Bold' for buttons and 'Noto Sans Mono' for tooltips, the foreground colour I've picked up from the icons.
+# The background from the windows themselves.
+# CUSTOM Uncomment and comment out "DEFAULT" to enable and use.
+#<identifier>  <push text field bg away from icons> <set font & button bg colours> text and _accelerators </span>
+#TXT_CANCELYAD="<span font='Noto Sans Mono'> </span><span font='Noto Sans Mono Bold' foreground='#78909C' background='#152126'> _Cancel    </span>"
+#TXT_LOGOUT_PC="<span font='Noto Sans Mono'> </span><span font='Noto Sans Mono Bold' foreground='#78909C' background='#152126'> _Log out   </span>"
+#TXT_LOCK_SCRN="<span font='Noto Sans Mono'> </span><span font='Noto Sans Mono Bold' foreground='#78909C' background='#152126'> Loc_k      </span>"
+#TXT_SLEEP_RAM="<span font='Noto Sans Mono'> </span><span font='Noto Sans Mono Bold' foreground='#78909C' background='#152126'> _Sleep     </span>"
+#TXT_RESTARTPC="<span font='Noto Sans Mono'> </span><span font='Noto Sans Mono Bold' foreground='#78909C' background='#152126'> Re_boot    </span>"
+#TXT_SHUT_DOWN="<span font='Noto Sans Mono'> </span><span font='Noto Sans Mono Bold' foreground='#78909C' background='#152126'> _Power off </span>"
+#TXT_HIBERNATE="<span font='Noto Sans Mono'> </span><span font='Noto Sans Mono Bold' foreground='#78909C' background='#152126'> H_ibernate </span>"
+#TXT_HYBRIDZZZ="<span font='Noto Sans Mono'> </span><span font='Noto Sans Mono Bold' foreground='#78909C' background='#152126'> H_yb Sleep </span>"
+# NOTE: Text alignment will be unpredictablep without a monospace font and matching field lengths.
+# `yad --font` and `yad --color` are useful for selection.
+
+# DEFAULT
+TXT_CANCELYAD="<span font='Noto Sans Mono'> _Cancel   </span>"
+TXT_LOGOUT_PC="<span font='Noto Sans Mono'> _Log out  </span>"
+TXT_LOCK_SCRN="<span font='Noto Sans Mono'> Loc_k     </span>"
+TXT_SLEEP_RAM="<span font='Noto Sans Mono'> _Sleep    </span>"
+TXT_RESTARTPC="<span font='Noto Sans Mono'> Re_boot   </span>"
+TXT_SHUT_DOWN="<span font='Noto Sans Mono'> _Power off</span>"
+TXT_HIBERNATE="<span font='Noto Sans Mono'> H_ibernate</span>"
+TXT_HYBRIDZZZ="<span font='Noto Sans Mono'> H_yb Sleep</span>"
+
+# Globally, tooltips.  I've just bunged in something for now :P
+# Colours can be set too, Custom 'BL-Moonlight" example:
+# CUSTOM Uncomment and comment out "DEFAULT" to enable and use.
+#TIP_CANCELYAD="<span font='Noto Sans Mono' foreground='#78909C' background='#152126'> Cancel and close window. </span>"
+#TIP_LOGOUT_PC="<span font='Noto Sans Mono' foreground='#78909C' background='#152126'> Log out from current session. </span>"
+#TIP_LOCK_SCRN="<span font='Noto Sans Mono' foreground='#78909C' background='#152126'> Lock current session. </span>"
+#TIP_SLEEP_RAM="<span font='Noto Sans Mono' foreground='#78909C' background='#152126'> Suspend computer. </span>"
+#TIP_RESTARTPC="<span font='Noto Sans Mono' foreground='#78909C' background='#152126'> Restart computer. </span>"
+#TIP_SHUT_DOWN="<span font='Noto Sans Mono' foreground='#78909C' background='#152126'> Shut down and power off. </span>"
+#TIP_HIBERNATE="<span font='Noto Sans Mono' foreground='#78909C' background='#152126'> Save computer state and power off. </span>"
+#TIP_HYBRIDZZZ="<span font='Noto Sans Mono' background='#152126'> Put in hybrid sleep mode. </span>"
+
+# DEFAULT
+TIP_CANCELYAD="Cancel and close window."
+TIP_LOGOUT_PC="Log out from current session."
+TIP_LOCK_SCRN="Lock current session."
+TIP_SLEEP_RAM="Suspend computer."
+TIP_RESTARTPC="Restart computer."
+TIP_SHUT_DOWN="Shut down and power off."
+TIP_HIBERNATE="Save computer state and power off."
+TIP_HYBRIDZZZ="Put in hybrid sleep mode."
+
+# Icons for normal buttons, for no icons in non-icon interfaces, set ""
+ICO_CANCELYAD="gtk-close"
+ICO_LOCK_SCRN="gnome-lockscreen"
+ICO_LOGOUT_PC="gnome-logout"
+ICO_SLEEP_RAM="system-suspend"
+ICO_HIBERNATE="system-hibernate"
+ICO_HYBRIDZZZ="system-suspend-hibernate"
+ICO_RESTARTPC="system-reboot"
+ICO_SHUT_DOWN="system-shutdown"
+# TODO: Create NO_ICONS= key so these can be left set when disabling button icons
+# Trivial to clear these values when NO_ICONS="true"
+
+# Icon interface images directory.
+# This can be set to a custom icon set in a folder of your choice.
+# Note: trailing / is required.
+IMAGE_PATH="/usr/share/images/bunsen/exit/light/"
+# Button image files.
+BTN_CANCELYAD="cancel-sm.png"
+BTN_LOGOUT_PC="logout-sm.png"
+# CURRENTLY NO FILE for BTN_LOCK_SCRN="$IMAGE_PATH/lock.png"
+# Using cancel[-sm].png ../dark/ renamed & copied [or reverse].
+BTN_LOCK_SCRN="lock-sm.png"
+BTN_SLEEP_RAM="sleep-sm.png"
+BTN_RESTARTPC="reboot-sm.png"
+BTN_SHUT_DOWN="poweroff-sm.png"
+BTN_HIBERNATE="hibernate-sm.png"
+# CURRENTLY NO FILE BTN_HYBRIDZZZ="$IMAGE_PATH/hybrid.png"
+# Using hibernate[-sm].png ../dark/ renamed & copied [or reverse].
+BTN_HYBRIDZZZ="hybrid-sm.png"
+
+# YAD tweaks
+BORDERS_STD=7
+BORDERS_ICON=20
+# TODO: See about re-enabling the text & image on top.
+
+# Troubleshooting :
+# Some screen locking software does not listen for logind calls,
+# screen locking then fails, for such screen lockers set
+# LOCK_SCREEN_COMMAND="what-locks-screen  --now"
+LOCK_SCREEN_COMMAND=""
+# Known tested examples: "i3lock", "slock", "xsceeensaver-command -lock"
+
+# May be useful if dialogue fails to launch because graphical session
+# is detected as a TTY typically when no display manager is installed.
+TTY_DETECT_OVERRIDE="false"
+# When set to "true" TTY use with no arguments will break as a
+# graphical user interface will be called.
+
+########################################################################
+#       Config block ends. Copy & paste block to config file.          #
+########################################################################
+
+# Usage: parse_config_vars <file>
+# No arrays, just read variables individually.
+# Preexisting variables will be overwritten.
+parse_config_vars(){
+    [[ -f $1 ]] || { echo "$1 is not a file." >&2;return 1;}
+    local line key value entry_regex
+    entry_regex="^[[:blank:]]*([[:alnum:]_]+)[[:blank:]]*=[[:blank:]]*('[^']+'|\"[^\"]+\"|[^#]+)"
+    while read -r line
+    do
+        [[ -n $line ]] || continue
+        [[ $line =~ $entry_regex ]] || continue
+        key=${BASH_REMATCH[1]}
+        value=${BASH_REMATCH[2]#[\'\"]} # strip quotes
+        value=${value%[\'\"]}
+        value=${value%${value##*[![:blank:]]}} # strip trailing spaces
+        declare -g "${key}"="${value}"
+    done < "$1"
+}
+export -f parse_config_vars
+
+# Load config from files, if present, otherwise use settings in head of this file.
+for conffile in /usr/share/bunsen/conf.d/bl-exit.conf /etc/bl-exit/bl-exit.conf ~/.config/bl-exit/bl-exit.conf
+    do
+        [[ -f $conffile ]] && parse_config_vars $conffile
+    done
+
+### Usage ###
+USAGE="\nbl-exit [OPTION]\n\n\
+With no arguments default yad (GUI) or text menu at a TTY\n\n\
+Only one argument is read, they cannot be combined\n\
+-h --help\tShow this help\n\
+-k --lock\tLock session\tDoes not work for a tty session\n\
+-l --logout\tLogout\t\tAlso works for tty.\n\
+-s --suspend\tSuspend\tState determined by ACPI S0 S1 or S3\n\
+-i --hibernate\tSuspend to Disk\tRequires enough swap to store RAM\n\
+-y --hybrid\tHybrid Sleep\tACPI must support sleep state S3\n\
+-b --reboot\tReboot\n\
+-p --poweroff\tShut down\n\n\
+GUI Options\n\
+-m --simple\t\t(GUI) Yad dialogue\n\
+-M --simple-hibernate\t(GUI) Adds hibernate option\n\
+   --simpl-all\t\t(GUI) Adds hibernate and hybrid-sleep\n\
+-v --vertical\t\t(GUI) Yad stacked buttons\n\
+-V --vertical-hibernate (GUI) Stacked, including hibernate\n\
+   --vertical-all\t(GUI) Stacked, all available options\n
+-n --icon\t\t(GUI) Row of icons\n\
+-N --icon-hibernate\t(GUI) Row of icons, including hibernate\n\
+   --icon-all\t\t(GUI) Row of icons, all available options\n
+-c --icon-vert\t\t(GUI) Icons stacked vertically\n\
+-C --icon-vert-hibernate\t(GUI) Icons stacked vertically, inc hibernate\n\
+   --icon-vert-all\t\t(GUI) Icons stacked vertically, all available\n
+Config options\n\
+   --configure\t\tEdit config settings, set defaults etc.\n\
+   --configure-system\tSystemwide settings and defaults (requires sudo)\n"
+
+export LOCK_SCREEN_COMMAND=$LOCK_SCREEN_COMMAND
+
+########################################################################
+#                  Compatibility function details                      #
+#                                                                      #
+# logoutctl() takes the following `systemctl` arguments:               #
+#                                                                      #
+# poweroff reboot suspend hibernate hybrid-sleep                       #
+# ? suspend-then-hibernate                                             #
+#                                                                      #
+# elogind supports it (documented), undocumented for systemd. It does  #
+# _something_ on my systemd systems YMMV. Not implimented in the main  #
+# script owing to not being documented by systemctl --help.            #
+#                                                                      #
+# Other systemctl arguments are not transferred to the elogind project #
+# and will break if a similar systemctl || loginctl approach is used.  #
+#                                                                      #
+# Also takes $LOCK_SCREEN_COMMAND if defined in config to handle       #
+# screen lockers which don't respond to `loginctl lock-session`        #
+#                                                                      #
+# loginctl lock-/terminate-session is handled here both to provide     #
+# central yad closing and for non-standard screen-lock compatibiliy.   #
+#                                                                      #
+########################################################################
+logoutctl(){
+    if [[ ! -z $YAD_PID ]]; then
+        kill -SIGUSR1 $YAD_PID
+    fi
+    case $1 in
+        cancel )
+            echo -e "\ncancelled"
+            exit 0 ;;
+        lock-session )
+            echo -e "\n$1"
+            [[ ! -z "$LOCK_SCREEN_COMMAND" ]] && $LOCK_SCREEN_COMMAND || loginctl $1 $XDG_SESSION_ID
+            exit $? ;;
+        terminate-session | lock-session )
+            echo  -e "\n$1"
+            loginctl $1 $XDG_SESSION_ID
+            exit $? ;;
+        suspend | hibernate | hybrid-sleep | suspend-then-hibernate | reboot | poweroff )
+            echo -e "\n$1"
+            # The systemd or elogind compatibility magic.   #
+            [[ $(command -v systemctl) ]] && systemctl "$1" || loginctl "$1"
+            exit $? ;;
+    esac
+}
+export -f logoutctl
+
+# Skip tty test if config option set
+if [[ "$TTY_DETECT_OVERRIDE" != "true" ]]; then
+    # If a yad picker or "lock" was chosen, test we're not at a TTY.
+    if [[ -z $@ ]] || [[ $1 =~ (-m|--simple|-M|--simple-hibernate|--simple-all|-v|--vertical|-V|--vertical-hibernate|--vertical-all|-n|--icon|-N|--icon-hibernate|--icon-all|-c|--icon-vert|-C|--icon-vert-hibernate|--icon-vert-all|-k|--lock)$ ]]; then
+        # Probably better ways, but: "Using systemd" :P Chops out 'x11;' in most DE's 'wayland;' in gnome and 'tty;' at a TTY or with no DM
+        if [[ $(loginctl session-status | grep Service: | cut -d " " -f5) = 'tty;' ]]; then
+            # We're at a TTY - Are we being asked to lock a TTY?
+            if [[ $1 =~ (-k|--lock)$ ]]; then
+                echo -e "Error: Graphical environment needed for screen locking."
+                echo -e "It can be done with the vlock package installed, using the"
+                echo -e "command 'vlock'. This script does not handle that case."
+                echo -e "If you have a graphical environment running the probable cause"
+                echo -e "of seeing this message is that no display manager is installed."
+                exit 1
+            fi
+            # TTY exit menu.
+            clear
+            TTY_EXIT="Please choose an option "
+            select option in Logout Sleep Hibernate Hybrid-Sleep Reboot Power-Off Quit-Dialogue
+            do
+                case $option in
+                    Logout)        logoutctl terminate-session;;
+                    Sleep)         logoutctl suspend;;
+                    Hibernate)     logoutctl hibernate;;
+                    Hybrid-Sleep)  logoutctl hybrid-sleep;;
+                    Reboot)        logoutctl reboot;;
+                    Power-Off)     logoutctl poweroff;;
+                    Quit-Dialogue) :;;
+                esac
+                break
+            done
+        fi
+    fi
+fi
+
+# Default setting
+if [[ -z $@ ]];then
+    OP_MODE="$DEFAULT_MODE"
+else
+    OP_MODE=$1
+fi
+
+# switch to icons if selected
+if [[ $OP_MODE =~ (-n|--icon|-N|--icon-hibernate|--icon-all|-c|--icon-vert|-C|--icon-vert-hibernate|--icon-vert-all)$ ]]; then
+    # clear button text
+    TXT_CANCELYAD=""
+    TXT_LOGOUT_PC=""
+    TXT_LOCK_SCRN=""
+    TXT_SLEEP_RAM=""
+    TXT_RESTARTPC=""
+    TXT_SHUT_DOWN=""
+    TXT_HIBERNATE=""
+    TXT_HYBRIDZZZ=""
+    # Switch icon set
+    ICO_CANCELYAD="$IMAGE_PATH$BTN_CANCELYAD"
+    ICO_LOGOUT_PC="$IMAGE_PATH$BTN_LOGOUT_PC"
+    ICO_LOCK_SCRN="$IMAGE_PATH$BTN_LOCK_SCRN"
+    ICO_SLEEP_RAM="$IMAGE_PATH$BTN_SLEEP_RAM"
+    ICO_RESTARTPC="$IMAGE_PATH$BTN_RESTARTPC"
+    ICO_SHUT_DOWN="$IMAGE_PATH$BTN_SHUT_DOWN"
+    ICO_HIBERNATE="$IMAGE_PATH$BTN_HIBERNATE"
+    ICO_HYBRIDZZZ="$IMAGE_PATH$BTN_HYBRIDZZZ"
+fi
+
+case $OP_MODE in
+    # command line use
+    -h|--help)
+        echo -e "$USAGE"
+        exit 0
+        ;;
+    -k|--lock)         logoutctl lock-session;;
+    -l|--logout)       logoutctl terminate-session;;
+    -s|--suspend)      logoutctl suspend;;
+    -i|--hibernate)    logoutctl hibernate;;
+    -y|--hybrid)       logoutctl hybrid-sleep;;
+    -b|--reboot)       logoutctl reboot;;
+    -p|--poweroff)     logoutctl poweroff;;
+    ####################################################################
+    #            GUI sections "yad hacking" starts here                #
+    ####################################################################
+    # TODO: Figure out producing all these from one block when done it #
+    #       should be possible to enable or disable whatever buttons   #
+    #       are desired in the config file.                            #
+    ####################################################################
+    # GUI
+    -m|--simple|-v|--vertical|-n|--icon|-c|--icon-vert)
+        COLUMNS=6
+        BORDERS="$BORDERS_STD"
+        [[ -z $TXT_ALIGN ]] && TXT_ALIGN="center"
+        [[ $OP_MODE =~ (-n|--icon)$ ]] && BORDERS=$BORDERS_ICON
+        [[ $OP_MODE =~ (-v|--vertical|-c|--icon-vert)$ ]] && COLUMNS=1
+        yad --form --columns=$COLUMNS --borders=$BORDERS --class=WmanExit \
+            --no-buttons --undecorated --center --on-top --skip-taskbar \
+            --field="$TXT_CANCELYAD!$ICO_CANCELYAD!$TIP_CANCELYAD":fbtn 'bash -c "logoutctl cancel"' \
+            --field="$TXT_LOCK_SCRN!$ICO_LOCK_SCRN!$TIP_LOCK_SCRN":fbtn 'bash -c "logoutctl lock-session"' \
+            --field="$TXT_LOGOUT_PC!$ICO_LOGOUT_PC!$TIP_LOGOUT_PC":fbtn 'bash -c "logoutctl terminate-session"' \
+            --field="$TXT_SLEEP_RAM!$ICO_SLEEP_RAM!$TIP_SLEEP_RAM":fbtn 'bash -c "logoutctl suspend"' \
+            --field="$TXT_RESTARTPC!$ICO_RESTARTPC!$TIP_RESTARTPC":fbtn 'bash -c "logoutctl reboot"' \
+            --field="$TXT_SHUT_DOWN!$ICO_SHUT_DOWN!$TIP_SHUT_DOWN":fbtn 'bash -c "logoutctl poweroff"' \
+            | grep -v "|" &
+        exit 0
+        ;;
+    # GUI with hibernate
+    -M|--simple-hibernate|-V|--vertical-hibernate|-N|--icon-hibernate|-C|--icon-vert-hibernate)
+        COLUMNS=7
+        BORDERS="$BORDERS_STD"
+        [[ -z $TXT_ALIGN ]] && TXT_ALIGN="center"
+        [[ $OP_MODE =~ (-N|--icon-hibernate)$ ]] && BORDERS=$BORDERS_ICON
+        [[ $OP_MODE =~ (-V|--vertical-hibernate|-C|--icon-vert-hibernate)$ ]] && COLUMNS=1
+        yad --form --columns=$COLUMNS --borders=$BORDERS --class=WmanExit \
+            --no-buttons --undecorated --center --on-top --skip-taskbar \
+            --field="$TXT_CANCELYAD!$ICO_CANCELYAD!$TIP_CANCELYAD":fbtn 'bash -c "logoutctl cancel"' \
+            --field="$TXT_LOCK_SCRN!$ICO_LOCK_SCRN!$TIP_LOCK_SCRN":fbtn 'bash -c "logoutctl lock-session"' \
+            --field="$TXT_LOGOUT_PC!$ICO_LOGOUT_PC!$TIP_LOGOUT_PC":fbtn 'bash -c "logoutctl terminate-session"' \
+            --field="$TXT_SLEEP_RAM!$ICO_SLEEP_RAM!$TIP_SLEEP_RAM":fbtn 'bash -c "logoutctl suspend"' \
+            --field="$TXT_HIBERNATE!$ICO_HIBERNATE!$TIP_HIBERNATE":fbtn 'bash -c "logoutctl hibernate"' \
+            --field="$TXT_RESTARTPC!$ICO_RESTARTPC!$TIP_RESTARTPC":fbtn 'bash -c "logoutctl reboot"' \
+            --field="$TXT_SHUT_DOWN!$ICO_SHUT_DOWN!$TIP_SHUT_DOWN":fbtn 'bash -c "logoutctl poweroff"' \
+            | grep -v "|" &
+        exit 0
+        ;;
+    # GUI all available buttons
+    --simple-all|--vertical-all|--icon-all|--icon-vert-all)
+        COLUMNS=8
+        BORDERS="$BORDERS_STD"
+        [[ -z $TXT_ALIGN ]] && TXT_ALIGN="center"
+        [[ $OP_MODE =~ (--icon-all)$ ]] && BORDERS=$BORDERS_ICON
+        [[ $OP_MODE =~ (--vertical-all|--icon-vert-all)$ ]] && COLUMNS=1
+        yad --form --columns=$COLUMNS --borders=$BORDERS --class=WmanExit \
+            --no-buttons --undecorated --center --on-top --skip-taskbar \
+            --field="$TXT_CANCELYAD!$ICO_CANCELYAD!$TIP_CANCELYAD":fbtn 'bash -c "logoutctl cancel"' \
+            --field="$TXT_LOCK_SCRN!$ICO_LOCK_SCRN!$TIP_LOCK_SCRN":fbtn 'bash -c "logoutctl lock-session"' \
+            --field="$TXT_LOGOUT_PC!$ICO_LOGOUT_PC!$TIP_LOGOUT_PC":fbtn 'bash -c "logoutctl terminate-session"' \
+            --field="$TXT_SLEEP_RAM!$ICO_SLEEP_RAM!$TIP_SLEEP_RAM":fbtn 'bash -c "logoutctl suspend"' \
+            --field="$TXT_HYBRIDZZZ!$ICO_HYBRIDZZZ!$TIP_HYBRIDZZZ":fbtn 'bash -c "logoutctl hybrid-sleep"' \
+            --field="$TXT_HIBERNATE!$ICO_HIBERNATE!$TIP_HIBERNATE":fbtn 'bash -c "logoutctl hibernate"' \
+            --field="$TXT_RESTARTPC!$ICO_RESTARTPC!$TIP_RESTARTPC":fbtn 'bash -c "logoutctl reboot"' \
+            --field="$TXT_SHUT_DOWN!$ICO_SHUT_DOWN!$TIP_SHUT_DOWN":fbtn 'bash -c "logoutctl poweroff"'\
+            | grep -v "|" &
+        exit 0
+        ;;
+    # Config handling
+    --configure)
+        # First see if we have a config file under ~ already, edit it if we have
+        if [[ ! -f ~/.config/bl-exit/bl-exit.conf ]]; then
+            # We don't have one already, check for one to copy:
+            if [[ -f /etc/bl-exit/bl-exit.conf ]]; then
+                # Copy the local admin one:
+                cp /etc/bl-exit/bl-exit.conf ~/.config/bl-exit/bl-exit.conf
+            # On failure try the distro one:
+            elif [[ -f /usr/share/bunsen/conf.d/bl-exit.conf ]]; then
+                # Copy that one instead:
+                cp /usr/share/bunsen/conf.d/bl-exit.conf ~/.config/bl-exit/bl-exit.conf
+            # On failure, we don't have one to copy:
+            else
+                # I could make this write one, but it'd mean storing
+                # that in the script too and working around quotation
+                # marks and $VARIABLES as the thing gets `cat` to its
+                # new home, dunnit before but YUK!
+                echo "Error, no baseline config file exists!"
+                echo "Using internal defaults."
+                exit 1
+            fi
+        fi
+        # We either have a user config file now, or bombed out.
+        USEREDIT="Please choose editor: "
+            select option in nano Geany Quit
+            do
+                case $option in
+                    nano)  nano -Swl ~/.config/bl-exit/bl-exit.conf;;
+                    Geany) geany ~/.config/bl-exit/bl-exit.conf && break;;
+                    Quit) break;;
+                esac
+            done
+        exit 0
+        ;;
+    # Config system
+    --configure-system)
+        # See if we already have a file create if not
+        if [[ ! -f /etc/bl-exit/bl-exit.conf ]]; then
+            # See if there's a distro file
+            echo "No config file found, attempting to copy distribution"
+            echo "settings, if found you will be asked for your password."
+            if [[ -f /usr/share/bunsen/conf.d/bl-exit.conf ]]; then
+                # In case the parent directory is not present
+                [[ -d /etc/bl-exit ]] || sudo mkdir -p /etc/bl-exit
+                sudo cp /usr/share/bunsen/conf.d/bl-exit.conf /etc/bl-exit/bl-exit.conf
+            else
+                # I could make this write one, but it'd mean storing
+                # that in the script too and working around quotation
+                # marks and $VARIABLES as the thing gets `cat` to its
+                # new home, dunnit before but YUK!
+                echo "Error, no baseline config file exists!"
+                echo "Using internal defaults."
+               exit 1
+            fi
+        fi
+        # We found or created /etc/bunsen/bl-exit.conf edit it
+        ADMINEDIT="Please choose editor, you may be asked for your password:"
+            select option in nano Geany Quit
+            do
+                case $option in
+                    nano)  sudo nano -Swl /etc/bl-exit/bl-exit.conf;;
+                    Geany) pkexec bl-text-editor /etc/bl-exit/bl-exit.conf && break;;
+                    Quit) break;;
+                esac
+            done
+        exit 0
+        ;;
+    # typo land
+    *)
+        echo -e "\nUnknown operation $1"
+        echo -e "$USAGE"
+        exit 1
+        ;;
+esac
+
+########################################################################
+##                                                                    ##
+## Version: 0.4~alpha-1                                               ##
+##                                                                    ##
+## Depends: bash,systemd | elogind,policykit-1                        ##
+##                                                                    ##
+## Recommends: yad,light-locker,x-display-manager                     ##
+##                                                                    ##
+## Note: re "Depends:" `systemctl` requires root or sudo unless       ##
+##       policykit-1 is silently providing it.                        ##
+##       yad not a hard depend because command line use is possible   ##
+##       without it.                                                  ##
+##                                                                    ##
+## KNOWN ISSUES: "Icon" interface has no available icons for          ##
+##               lock-session or hybrid-sleep.                        ##
+##                                                                    ##
+## BUGS: Probably.                                                    ##
+##                                                                    ##
+## Customization: Copy to ~/bin Then hack away `man yad` is more use  ##
+##                than any help file or manual page I could write.    ##
+##                                                                    ##
+## Dedicated to: Debian Ecosystem Init Diversity Team                 ##
+##               <debian-init-diversity@chiark.greenend.org.uk>       ##
+##               May their efforts meet with every success.           ##
+##                                                                    ##
+########################################################################
+
+########################################################################
+#                                                                      #
+#                             Change Log                               #
+#                                                                      #
+########################################################################
+#                                                                      #
+# Version: 0.4~alpha-1                                                 #
+#          Added vertical icons GUI, GUI options now doubled since 0.2 #
+#          Added config parser to read external config files.          #
+#          Added command line options to edit .conf config files.      #
+#                bl-exit.conf chosen so as not to clash with bl-exitrc #
+#                for testing.                                          #
+#          Updated hard-coded config to include guidance and an        #
+#              example of customized settings, so it can be copied to  #
+#              a file in an appropriate location as a block.           #
+#                                                                      #
+# Version: 0.3~alpha-1                                                 #
+#          Place config options together.                              #
+#          Config for option for previously troublesome lockers.       #
+#              (slock i3lock and xscreenaver)                          #
+#          Override for TTY detection for no display manager.          #
+#          Reduce code repetition.                                     #
+#          Provide icon-only interface options.                        #
+#          Rationalize command-line arguments only long arguments to   #
+#              show hybrid-sleep GUI options. Who uses that?           #
+#          Removed text and image from yad header. Causing issues.     #
+#              (May revisit)                                           #
+#                                                                      #
+# Version: 0.2~alpha-1                                                 #
+#          Added keyboard accelerators.                                #
+#          Fixed typo on one button.                                   #
+#                                                                      #
+# Version: 0.1~alpha-1                                                 #
+#          Initial script.                                             #
+#                                                                      #
+########################################################################
