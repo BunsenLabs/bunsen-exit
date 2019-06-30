@@ -2,7 +2,7 @@ Source: bunsen-exit
 Section: misc
 Priority: optional
 Maintainer: John Crawley <john@bunsenlabs.org>
-Build-Depends: debhelper (>= 10), help2man
+Build-Depends: debhelper (>= 10), help2man, python2.7, python-dbus
 Standards-Version: 4.3.0
 Homepage: https://github.com/BunsenLabs/bunsen-exit
 Vcs-Git: https://github.com/BunsenLabs/bunsen-exit.git
