@@ -139,20 +139,24 @@ on_terminal(){
         return 1
     fi
 }
+#on_graphical_session(){
+#    case "$( loginctl show-session -p Type $XDG_SESSION_ID )"
+#    in
+#        'Type=x11'|'Type=wayland')
+#            return 0
+#            ;;
+#        'Type=tty')
+#            return 1
+#            ;;
+#        *)
+#            echo "$0: unable to determine session type." >&2
+#            exit 1
+#            ;;
+#    esac
+#}
 on_graphical_session(){
-    case "$( loginctl show-session -p Type $XDG_SESSION_ID )"
-    in
-        'Type=x11'|'Type=wayland')
-            return 0
-            ;;
-        'Type=tty')
-            return 1
-            ;;
-        *)
-            echo "$0: unable to determine session type." >&2
-            exit 1
-            ;;
-    esac
+    [[ -n $DISPLAY || -n $WAYLAND_DISPLAY ]] && return 0
+    return 1
 }
 
 # only display this on a TTY
