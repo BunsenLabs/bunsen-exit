@@ -1,3 +1,9 @@
+bunsen-exit (10.2-1) lithium; urgency=medium
+
+  * bunsen-exit: change graphical test to cover users using startx.
+
+ -- John Crawley <john@bunsenlabs.org>  Fri, 08 Nov 2019 16:47:28 +0900
+
 bunsen-exit (10.1-2) lithium; urgency=medium
 
   * Add Build-depends for man page generation.
