@@ -1,2 +1,3 @@
 bin/* usr/bin
 img/light/poweroff.png usr/share/images/bunsen/exit/light
+img/dark/poweroff.png usr/share/images/bunsen/exit/dark
