@@ -1,3 +1,9 @@
+bunsen-exit (10.2.1-1) lithium; urgency=medium
+
+  * Bunsen-exit: add dark poweroff icon.
+
+ -- John Crawley <john@bunsenlabs.org>  Sat, 16 May 2020 13:48:15 +0900
+
 bunsen-exit (10.2-1) lithium; urgency=medium
 
   * bunsen-exit: change graphical test to cover users using startx.
