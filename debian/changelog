@@ -1,3 +1,14 @@
+bunsen-exit (11.0-1) beryllium; urgency=medium
+
+  * Migrate for Debian Bullseye.
+    + debian/control: Bump Standards-Version to 4.5.1 - no changes required.
+    + debian/control: Declare debhelper compatibility 12.
+    + Remove debian/compat, now unnecessary.
+    + debian/copyright: update year.
+  * Remove bunsen-exit-python: it uses python2 and GTK2.
+
+ -- John Crawley <john@bunsenlabs.org>  Thu, 04 Feb 2021 18:43:11 +0900
+
 bunsen-exit (10.2.2-1) lithium; urgency=medium
 
   * Correct package name in bl-exitrc, update debian/copyright.
@@ -178,7 +189,7 @@ bunsen-utilities (8.6.6-1) bunsen-hydrogen; urgency=low
   * bl-exit: Restore acceleration
   * Use Alt+b for reboot 
 
- -- xaos52 <me@medion.localdomain>  Thu, 07 Apr 2016 16:44:46 +0200
+ -- xaos52 <me@medion.localdomain.org>  Thu, 07 Apr 2016 16:44:46 +0200
 
 bunsen-utilities (8.6.5-1) bunsen-hydrogen; urgency=low
 
