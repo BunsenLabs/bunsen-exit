@@ -2,20 +2,20 @@ Source: bunsen-exit
 Section: misc
 Priority: optional
 Maintainer: John Crawley <john@bunsenlabs.org>
-Build-Depends: debhelper-compat (= 12), help2man
-Standards-Version: 4.5.1
+Build-Depends: debhelper-compat (= 13), help2man
+Rules-Requires-Root: no
+Standards-Version: 4.6.1.0
 Homepage: https://github.com/BunsenLabs/bunsen-exit
 Vcs-Git: https://github.com/BunsenLabs/bunsen-exit.git
 Vcs-Browser: https://github.com/BunsenLabs/bunsen-exit
 
 Package: bunsen-exit
 Architecture: all
-Depends: ${misc:Depends}, systemd|elogind, policykit-1
-Recommends: yad, light-locker 
+Depends: ${misc:Depends}, systemd|elogind, polkitd, polkitd-pkla
+Recommends: yad, light-locker
 Replaces: bunsen-utilities (<<9.2-1), bunsen-exit-python
 Breaks: bunsen-utilities (<<9.2-1)
 Conflicts: bunsen-exit-python
 Description: Bunsen logout script.
  GUI logout/suspend/reboot/poweroff script, with a GUI,
  TTY menu and CLI options.
-
