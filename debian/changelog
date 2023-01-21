@@ -1,3 +1,19 @@
+bunsen-exit (12.0-1) boron; urgency=medium
+
+  * Update debian/control:
+    - Standards version to 4.6.1.0
+    - Debhelper compatibility to 13
+    - Add Rules-Requires-Root: no
+    - Replace Depends: policykit-1 with polkitd, polkitd-pkla
+
+  * Update debian/copyright:
+    - Update year
+    - Format: use https url
+
+  * Update debian/genman.sh to ver 20220126
+
+ -- John Crawley <john@bunsenlabs.org>  Sat, 21 Jan 2023 16:07:49 +0900
+
 bunsen-exit (11.0-1) beryllium; urgency=medium
 
   * Migrate for Debian Bullseye.
@@ -187,7 +203,7 @@ bunsen-utilities (8.6.7-1) bunsen-hydrogen; urgency=medium
 bunsen-utilities (8.6.6-1) bunsen-hydrogen; urgency=low
 
   * bl-exit: Restore acceleration
-  * Use Alt+b for reboot 
+  * Use Alt+b for reboot
 
  -- xaos52 <me@medion.localdomain.org>  Thu, 07 Apr 2016 16:44:46 +0200
 
@@ -526,4 +542,3 @@ cb-exit (0.01) unstable; urgency=low
   * Initial release.
 
  -- Philip Newborough <corenominal@corenominal.org>  Mon, 16 Apr 2012 11:28:48 +0100
-
