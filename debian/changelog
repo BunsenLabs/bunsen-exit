@@ -1,3 +1,9 @@
+bunsen-exit (12.1-1) boron; urgency=medium
+
+  * Add .desktop file for auto-generated menus.
+
+ -- John Crawley <john@bunsenlabs.org>  Sat, 19 Aug 2023 16:15:12 +0900
+
 bunsen-exit (12.0-1) boron; urgency=medium
 
   * Update debian/control:
