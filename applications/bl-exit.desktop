@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Exit session
+Comment=Exit desktop session, choosing Logout, Lock Screen, Suspend, Reboot or Power Off.
+Exec=bl-exit
+Icon=system-log-out
+Type=Application
+Categories=System
+StartupNotify=false
+Terminal=false
