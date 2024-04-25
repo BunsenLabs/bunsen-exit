@@ -1,3 +1,9 @@
+bunsen-exit (13.0-1) carbon; urgency=medium
+
+  * Reinstate config file.
+
+ -- Mick Amadio <01micko@gmail.com>  Wed 24 Apr 2024 19:51:39 +1000
+
 bunsen-exit (12.1-1) boron; urgency=medium
 
   * Add .desktop file for auto-generated menus.

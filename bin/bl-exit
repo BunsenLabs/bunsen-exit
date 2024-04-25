@@ -68,6 +68,9 @@ It can be done with the vlock package installed, using the
 command 'vlock'. This script does not handle that case.
 If you have a graphical environment running the probable cause
 of seeing this message is that no display manager is installed.
+An alternative screen locker can be set in
+$HOME/.config/bunsen/bl-lock with the following line:
+LOCK_SCREEN_COMMAND=\"what-locks-screen --options\"
 "
 
 # Some screen locking software does not listen for logind calls,
@@ -100,6 +103,10 @@ LOCK_SCREEN_COMMAND=""
 #                                                                      #
 ########################################################################
 logoutctl(){
+    # because this file can be 'touched' we must check for existence and
+    # that it contains data
+    [[ -f "$HOME/.config/bunsen/bl-lock" ]] && [[ -s "$HOME/.config/bunsen/bl-lock" ]] && \
+        source $HOME/.config/bunsen/bl-lock
     if [[ ! -z $YAD_PID ]]; then
         kill -SIGUSR1 $YAD_PID
     fi
@@ -180,7 +187,8 @@ tty_menu(){
 
 # can only use this in a graphical session
 yad_gui() {
-    yad --class=WmanExit --title "Exit" --close-on-unfocus --undecorated --center --on-top --borders=10 --window-icon=system-log-out \
+    yad --class=WmanExit --title "Exit" --close-on-unfocus --undecorated --center \
+        --on-top --borders=10 --window-icon=system-log-out --name=system-log-out \
         --button=" _Logout!system-log-out!Logout":'bash -c "logoutctl terminate-session"' \
         --button=" L_ock Screen!system-lock-screen!":'bash -c "logoutctl lock-session"' \
         --button=" _Suspend!system-suspend!":'bash -c "logoutctl suspend"' \
