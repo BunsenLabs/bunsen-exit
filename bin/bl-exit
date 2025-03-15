@@ -263,7 +263,7 @@ yad_gui() {
             buttons+=("${yadbutton[$b]}") ;;
         esac
     done
-    yad --class=WmanExit --title "Exit" --close-on-unfocus --undecorated --center --on-top --borders=10 --window-icon=system-log-out \
+    yad --class=WmanExit --title "Exit" --close-on-unfocus --undecorated --center --on-top --borders=10 --window-icon=system-log-out --name=system-log-out \
     "${buttons[@]}"
 }
 
