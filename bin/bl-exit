@@ -183,7 +183,7 @@ logoutctl(){
             exit 0 ;;
         lock-session )
             echo -e "\n$1"
-            [[ -n "$LOCK_SCREEN_COMMAND" ]] && $LOCK_SCREEN_COMMAND || loginctl $1 $XDG_SESSION_ID
+            [[ -n "$LOCK_SCREEN_COMMAND" ]] && $LOCK_SCREEN_COMMAND || bl-lock
             exit $? ;;
         terminate-session )
             echo  -e "\n$1"
