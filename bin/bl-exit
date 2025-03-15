@@ -98,8 +98,9 @@ showbutton=(
     [poweroff]=true
 )
 
-# Sysadmins can change the above configurations by editing this file:
+# Sysadmins can change the above configurations by editing these files:
 config_file=/etc/bl-exit/bl-exit.conf
+[[ -n "$WAYLAND_DISPLAY" ]] && config_file=/etc/bl-exit/bl-exit-wayland.conf
 
 ########################################################################
 
@@ -263,7 +264,7 @@ yad_gui() {
             buttons+=("${yadbutton[$b]}") ;;
         esac
     done
-    yad --class=WmanExit --title "Exit" --close-on-unfocus --undecorated --center --on-top --borders=10 --window-icon=system-log-out \
+    yad --class=WmanExit --title "Exit" --close-on-unfocus --undecorated --center --on-top --borders=10 --window-icon=system-log-out --name=system-log-out \
     "${buttons[@]}"
 }
 
