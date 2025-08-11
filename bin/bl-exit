@@ -4,7 +4,7 @@
 #     via both GUI and CLI
 #    Copyright: 2019 MXStuff.org <init.choice@mxstuff.org>
 #               2019 hhh <hsumen@bunsenlabs.org>
-#               2019-2024 John Crawley <john@bunsenlabs.org>
+#               2019-2025 John Crawley <john@bunsenlabs.org>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -59,10 +59,6 @@ Only one argument is read, they cannot be combined\n\
     -b --reboot\tReboot\n\
     -p --poweroff\tShut down\n\n\
 
-NOTE: Screen locking is done via loginctl, and only available if
-called directly as 'bl-exit --lock'.
-In BunsenLabs the bl-lock utility is also available.
-
 See: https://forums.bunsenlabs.org/viewtopic.php?id=9042
 for a discussion of Hibernate options.
 "
@@ -79,10 +75,15 @@ of seeing this message is that no display manager is installed.
 # Default settings:
 
 # Some screen locking software does not listen for logind calls,
-# screen locking then fails, for such screen lockers set
-# LOCK_SCREEN_COMMAND="what-locks-screen  --now"
-LOCK_SCREEN_COMMAND=""
-# Known tested examples: "i3lock", "slock", "xscreensaver-command -lock"
+# screen locking then fails - for such screen lockers set
+# XORG_LOCK_SCREEN_COMMAND="what-locks-screen  --now"
+# or
+# WAYLAND_LOCK_SCREEN_COMMAND="what locks screen on Wayland"
+# Known tested examples for XORG: "i3lock", "slock", "xscreensaver-command -lock"
+
+# default lock commands for Xorg and Wayland, defined as arrays
+XORG_LOCK_SCREEN_COMMAND=(loginctl lock-session "$XDG_SESSION_ID")
+WAYLAND_LOCK_SCREEN_COMMAND=(gtklock -d)
 
 # Which buttons to show in yad dialog by default.
 # These can be changed in the config file /etc/bl-exit/bl-exit.conf
@@ -150,7 +151,7 @@ parse_config(){
     local -n config_array="${2:-config}"
     declare -Ag "${!config_array}" || return 1
     local line key value comment_regex section_regex entry_regex
-    comment_regex="^[[:blank:]]*#.*$"
+    comment_regex="^[[:blank:]]*#"
     section_regex="^[[:blank:]]*\[[[:blank:]]*([[:alpha:]_][[:alnum:]_]*)[[:blank:]]*\][[:blank:]]*(#.*)?$"
     entry_regex="^[[:blank:]]*([[:alpha:]_][[:alnum:]_-]*)[[:blank:]]*=[[:blank:]]*('[^']+'|\"[^\"]+\"|[^#[:blank:]]+)[[:blank:]]*(#.*)*$"
     while read -r line
@@ -182,8 +183,9 @@ logoutctl(){
             echo -e "\ncancelled"
             exit 0 ;;
         lock-session )
+            . "$tmplockcmd" || { echo "$O Cannot source $tmplockcmd" >&2; exit 1; }
             echo -e "\n$1"
-            [[ -n "$LOCK_SCREEN_COMMAND" ]] && $LOCK_SCREEN_COMMAND || loginctl $1 $XDG_SESSION_ID
+            "${LOCK_SCREEN_COMMAND[@]}"
             exit $? ;;
         terminate-session )
             echo  -e "\n$1"
@@ -192,13 +194,19 @@ logoutctl(){
         suspend | hibernate | hybrid-sleep | suspend-then-hibernate | reboot | poweroff )
             echo -e "\n$1"
             # The systemd or elogind compatibility magic.   #
-            [[ $(command -v systemctl) ]] && systemctl "$1" || loginctl "$1"
+            if command -v systemctl >/dev/null 2>&1
+            then
+                systemctl "$1"
+            else
+                loginctl "$1"
+            fi
             exit $? ;;
     esac
 }
 export -f logoutctl
 
 # tests
+
 on_terminal(){
     if [[ -t 0 ]]
     then
@@ -213,6 +221,29 @@ on_terminal(){
         return 1
     fi
 }
+
+get_session_type() {
+    if [[ -n $WAYLAND_DISPLAY ]]
+    then
+        session_type='wayland'
+    elif [[ -n $DISPLAY ]]
+    then
+        session_type='xorg'
+    else
+        on_terminal && session_type='tty' || {
+            echo "$0: unable to determine session type." >&2
+            exit 1
+        }
+    fi
+}
+
+on_graphical_session(){
+    case $session_type in
+    xorg|wayland) return 0 ;;
+    esac
+    return 1
+}
+
 #on_graphical_session(){
 #    case "$( loginctl show-session -p Type $XDG_SESSION_ID )"
 #    in
@@ -228,10 +259,6 @@ on_terminal(){
 #            ;;
 #    esac
 #}
-on_graphical_session(){
-    [[ -n $DISPLAY || -n $WAYLAND_DISPLAY ]] && return 0
-    return 1
-}
 
 # only display this on a TTY
 tty_menu(){
@@ -268,7 +295,27 @@ yad_gui() {
 }
 
 [[ -r "$config_file" ]] && parse_config "$config_file"|| echo "${0}: failed to parse $config_file, using default settings." >&2
-[[ -n "${settings[LOCK_SCREEN_COMMAND]}" ]] && LOCK_SCREEN_COMMAND=${settings[LOCK_SCREEN_COMMAND]}
+
+get_session_type
+
+# determine lock screen command
+case $session_type in
+xorg)
+    LOCK_SCREEN_COMMAND=("${XORG_LOCK_SCREEN_COMMAND[@]}")
+    [[ -n "${settings[XORG_LOCK_SCREEN_COMMAND]}" ]] && read -ra LOCK_SCREEN_COMMAND <<<"${settings[XORG_LOCK_SCREEN_COMMAND]}"
+    ;;
+wayland)
+    LOCK_SCREEN_COMMAND=("${WAYLAND_LOCK_SCREEN_COMMAND[@]}")
+    [[ -n "${settings[WAYLAND_LOCK_SCREEN_COMMAND]}" ]] && read -ra LOCK_SCREEN_COMMAND <<<"${settings[WAYLAND_LOCK_SCREEN_COMMAND]}"
+    ;;
+esac
+command -v "${LOCK_SCREEN_COMMAND[0]}" >/dev/null 2>&1 || {
+    echo "$0: ${LOCK_SCREEN_COMMAND[0]} no such command." >&2
+    exit 1
+}
+tmplockcmd=$( mktemp ) || { echo "$0 Failed to make tmplockcmd" >&2; exit 1;}
+declare -p LOCK_SCREEN_COMMAND > "$tmplockcmd"
+export tmplockcmd
 
 case "$1" in
     -h|--help)
@@ -323,4 +370,3 @@ and unable to display exit menu." >&2
         exit 1
         ;;
 esac
-
