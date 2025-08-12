@@ -85,6 +85,8 @@ of seeing this message is that no display manager is installed.
 # default lock commands for Xorg and Wayland, defined as arrays
 XORG_LOCK_SCREEN_COMMAND=(loginctl lock-session "$XDG_SESSION_ID")
 WAYLAND_LOCK_SCREEN_COMMAND=(gtklock -d)
+# alternative
+#WAYLAND_LOCK_SCREEN_COMMAND=(swaylock -F -f --indicator-idle-visible  -i /usr/share/images/bunsen/wallpapers/default/default)
 
 # Which buttons to show in yad dialog by default.
 # These can be changed in the config file /etc/bl-exit/bl-exit.conf
