@@ -83,7 +83,7 @@ of seeing this message is that no display manager is installed.
 
 # default lock commands for Xorg and Wayland, defined as arrays
 XORG_LOCK_SCREEN_COMMAND=(dm-tool lock)
-WAYLAND_LOCK_SCREEN_COMMAND=(dm-tool lock)
+WAYLAND_LOCK_SCREEN_COMMAND=(gtklock -d)
 # (dm-tool is shipped with lightdm)
 # Xorg alternative
 #XORG_LOCK_SCREEN_COMMAND=(xfce4-screensaver-command --lock)
