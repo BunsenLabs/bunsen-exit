@@ -12,7 +12,7 @@ Vcs-Browser: https://github.com/BunsenLabs/bunsen-exit
 Package: bunsen-exit
 Architecture: all
 Depends: ${misc:Depends}, systemd|elogind
-Recommends: yad, light-locker
+Recommends: yad, lightdm, xss-lock
 Replaces: bunsen-utilities (<<9.2-1), bunsen-exit-python
 Breaks: bunsen-utilities (<<9.2-1)
 Conflicts: bunsen-exit-python

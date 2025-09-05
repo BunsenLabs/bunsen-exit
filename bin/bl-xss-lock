@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# launch unique instance of xss-lock,
+# only if a screensaver daemon is not running
+
+pkill -x xss-lock # may be remaining from wayland session
+
+sleep 1 # allow time for xfce4-screensaver or light-locker to start
+
+pidof xfce4-screensaver >/dev/null && exit 0
+pidof light-locker >/dev/null && exit 0
+
+exec xss-lock -- bl-exit --lock
