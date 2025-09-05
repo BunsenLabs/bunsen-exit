@@ -62,6 +62,10 @@ Only one argument is read, they cannot be combined\n\
 
 See: https://forums.bunsenlabs.org/viewtopic.php?id=9042
 for a discussion of Hibernate options.
+
+To edit settings, users can copy /etc/bunsen-exit/bl-exit.conf
+to ~/.config/bunsen-exit/bl-exit.conf
+and uncomment the lines they want to change.
 "
 
 lock_tty_msg="Error: Graphical environment needed for screen locking.
