@@ -75,17 +75,16 @@ of seeing this message is that no display manager is installed.
 
 # Default settings:
 
-# Some screen locking software does not listen for logind calls,
-# screen locking then fails - for such screen lockers set
-# XORG_LOCK_SCREEN_COMMAND="what-locks-screen  --now"
-# or
-# WAYLAND_LOCK_SCREEN_COMMAND="what locks screen on Wayland"
 # Known tested examples for XORG: "i3lock", "slock", "xscreensaver-command -lock"
 
 # default lock commands for Xorg and Wayland, defined as arrays
-XORG_LOCK_SCREEN_COMMAND=(loginctl lock-session "$XDG_SESSION_ID")
-WAYLAND_LOCK_SCREEN_COMMAND=(gtklock -d)
-# alternative
+XORG_LOCK_SCREEN_COMMAND=(dm-tool lock)
+WAYLAND_LOCK_SCREEN_COMMAND=(dm-tool lock)
+# (dm-tool is shipped with lightdm)
+# Xorg alternative
+#XORG_LOCK_SCREEN_COMMAND=(xfce4-screensaver-command --lock)
+# Wayland alternatives
+#WAYLAND_LOCK_SCREEN_COMMAND=(gtklock -d)
 #WAYLAND_LOCK_SCREEN_COMMAND=(swaylock -F -f --indicator-idle-visible  -i /usr/share/images/bunsen/wallpapers/default/default)
 
 # Which buttons to show in yad dialog by default.
@@ -103,7 +102,10 @@ showbutton=(
 )
 
 # Sysadmins can change the above configurations by editing this file:
-config_file=/etc/bl-exit/bl-exit.conf
+sys_config_file=/etc/bunsen-exit/bl-exit.conf
+# Users can copy that file to ~/.config/bunsen-exit/bl-exit.conf
+# and edit it to taste.
+user_config_file=$HOME/.config/bunsen-exit/bl-exit.conf
 
 ########################################################################
 
@@ -226,12 +228,28 @@ on_terminal(){
 }
 
 get_session_type() {
+    # BUNSEN_SESSION_TYPE is exported by bunsenlabs-session
+    case $BUNSEN_SESSION_TYPE in
+    x11|wayland)
+        session_type=$BUNSEN_SESSION_TYPE
+        return 0
+        ;;
+    '')
+        ;;
+    *)
+        echo "$0: unexpected session type: $BUNSEN_SESSION_TYPE" >&2
+        exit 1
+        ;;
+    esac
+    # fallback if BUNSEN_SESSION_TYPE was not available
     if [[ -n $WAYLAND_DISPLAY ]]
     then
         session_type='wayland'
+        return 0
     elif [[ -n $DISPLAY ]]
     then
-        session_type='xorg'
+        session_type='x11'
+        return 0
     else
         on_terminal && session_type='tty' || {
             echo "$0: unable to determine session type." >&2
@@ -242,26 +260,10 @@ get_session_type() {
 
 on_graphical_session(){
     case $session_type in
-    xorg|wayland) return 0 ;;
+    x11|wayland) return 0 ;;
     esac
     return 1
 }
-
-#on_graphical_session(){
-#    case "$( loginctl show-session -p Type $XDG_SESSION_ID )"
-#    in
-#        'Type=x11'|'Type=wayland')
-#            return 0
-#            ;;
-#        'Type=tty')
-#            return 1
-#            ;;
-#        *)
-#            echo "$0: unable to determine session type." >&2
-#            exit 1
-#            ;;
-#    esac
-#}
 
 # only display this on a TTY
 tty_menu(){
@@ -297,13 +299,21 @@ yad_gui() {
     "${buttons[@]}"
 }
 
-[[ -r "$config_file" ]] && parse_config "$config_file"|| echo "${0}: failed to parse $config_file, using default settings." >&2
+if [[ -r "$user_config_file" ]]
+then
+    parse_config "$user_config_file"
+elif [[ -r "$sys_config_file" ]]
+then
+    parse_config "$sys_config_file"
+else
+    echo "${0}: failed to parse config file, using default settings." >&2
+fi
 
 get_session_type
 
 # determine lock screen command
 case $session_type in
-xorg)
+x11)
     LOCK_SCREEN_COMMAND=("${XORG_LOCK_SCREEN_COMMAND[@]}")
     [[ -n "${settings[XORG_LOCK_SCREEN_COMMAND]}" ]] && read -ra LOCK_SCREEN_COMMAND <<<"${settings[XORG_LOCK_SCREEN_COMMAND]}"
     ;;
