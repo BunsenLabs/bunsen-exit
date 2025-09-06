@@ -3,5 +3,6 @@ img/light/poweroff.png usr/share/images/bunsen/exit/light
 img/dark/poweroff.png usr/share/images/bunsen/exit/dark
 applications usr/share
 xfce-perchannel-xml usr/share/bunsen/skel/.config/xfce4/xfconf
-autostart etc/xdg
+system-autostart/* etc/xdg/autostart
+user-autostart/* usr/share/bunsen/skel/.config/autostart
 bunsen-exit etc
