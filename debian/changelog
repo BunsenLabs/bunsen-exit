@@ -1,3 +1,11 @@
+bunsen-exit (13.3-1) carbon; urgency=medium
+
+  * Use xfce4-screensaver for locking on X11,
+     and xss-lock + gtklock on Wayland.
+  * Users can edit configurations in ~/.config/bunsen-exit/bl-exit.conf
+
+ -- John Crawley <john@bunsenlabs.org>  Sat, 06 Sep 2025 16:35:59 +0900
+
 bunsen-exit (13.2.1-2) carbon; urgency=medium
 
   * Remove redundant dependencies on polkitd and polkitd-pkla.
