@@ -2,3 +2,37 @@ bunsen-exit
 ===========
 
 bunsen-exit: Logout dialog box with various options, using yad as GUI.
+
+NEWS 2025/9
+The default lock screen commands are currently 'xfce4-screensave-command --lock'
+and 'gtklock -d' for X11 and Wayland respectively.
+These defaults might change in the future, and can be changed by developers
+in bin/bl-exit, by sysadmins in the installed /etc/bunsen-exit/bl-exit.conf
+or by users by copying bl-exit.conf to ~/.config/bunsen-exit/bl-exit.conf
+If a daemon screenlocker is not running (ie xfce4-screenlocker or light-locker)
+then xss-lock is started and runs 'bl-exit-lock'.
+
+Bunsen-exit needs xfce4-screensaver (X11), xss-lock and gtklock (Wayland) 
+for the default screen lock to work 
+but if alternative lockers are used that may cease to be true.
+ 
+Files in xfce-perchannel-xml/ are to tweak the behaviour of xfce utilities:
+xfce4-desktop.xml: xfce4-desktop itself is not used, but this file sets the background wallpaper
+for the screenlocker password window.
+xfce4-screensaver.xml: the screensaver is disabled by default, but users
+can enable it from the GUI settings. The screenlocker is enabled.
+xfce4-session.xml: this sets the default screen lock command to 'bl-exit --lock'
+and is needed when using xss-lock.
+These files are installed to /usr/share/bunsen/skel and will be imported to 
+user configs.
+
+Files in autostart/
+bl-xss-lock.desktop: launches the wrapper script bl-xss-lock, and hence xss-lock,
+but only if neither xfce4-screensaver nor light-locker has been launched.
+xfce4-screensaver.desktop: overrides OnlyShowIn=XFCE so it will start on BunsenLabs.
+
+Files in bin/
+bl-exit: the main script
+bl-xss-lock: checks that neither xfce4-screensaver nor light-locker are running,
+after waiting 1s, also kills any instances of xss-lock maybe left over from a Wayland session.
+
