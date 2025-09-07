@@ -1,3 +1,11 @@
+bunsen-exit (13.3.1-1) carbon; urgency=medium
+
+  * Move xfce4-screensaver launch from user autostart to system autostart.
+  * After upgrade from 13.3-1, users can safely remove 
+     ~/.config/autostart/xfce4-screensaver.desktop
+
+ -- John Crawley <john@bunsenlabs.org>  Sun, 07 Sep 2025 11:05:59 +0900
+
 bunsen-exit (13.3-1) carbon; urgency=medium
 
   * Use xfce4-screensaver for locking on X11,
