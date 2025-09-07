@@ -8,5 +8,8 @@
     <property name="user-switching" type="empty">
       <property name="enabled" type="bool" value="false"/>
     </property>
+    <property name="saver-activation" type="empty">
+      <property name="enabled" type="bool" value="false"/>
+    </property>
   </property>
 </channel>
