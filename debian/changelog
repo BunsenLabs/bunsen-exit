@@ -1,3 +1,9 @@
+bunsen-exit (13.3.2-1) carbon; urgency=medium
+
+  * Update bl-exit.conf's commented out default commands to match bl-exit.
+
+ -- John Crawley <john@bunsenlabs.org>  Fri, 12 Sep 2025 20:12:58 +0900
+
 bunsen-exit (13.3.1-1) carbon; urgency=medium
 
   * Move xfce4-screensaver launch from user autostart to system autostart.
