@@ -1,3 +1,9 @@
+bunsen-exit (13.3.3-1) carbon; urgency=medium
+
+  * Bugfix: correct lock command used by xfce4-power-manager.
+
+ -- John Crawley <john@bunsenlabs.org>  Thu, 23 Apr 2026 11:27:03 +0900
+
 bunsen-exit (13.3.2-1) carbon; urgency=medium
 
   * Update bl-exit.conf's commented out default commands to match bl-exit.
