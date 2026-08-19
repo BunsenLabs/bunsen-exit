@@ -194,6 +194,7 @@ logoutctl(){
             exit $? ;;
         terminate-session )
             echo  -e "\n$1"
+            pgrep -x -u "$USER" openbox > /dev/null && { openbox --exit; sleep 1; } # openbox ignores SIGTERM sent by loginctl
             loginctl $1 $XDG_SESSION_ID
             exit $? ;;
         suspend | hibernate | hybrid-sleep | suspend-then-hibernate | reboot | poweroff )
