@@ -4,7 +4,7 @@
 #     via both GUI and CLI
 #    Copyright: 2019 MXStuff.org <init.choice@mxstuff.org>
 #               2019 hhh <hsumen@bunsenlabs.org>
-#               2019-2025 John Crawley <john@bunsenlabs.org>
+#               2019-2026 John Crawley <john@bunsenlabs.org>
 #               2025 Mick Amadio
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -141,13 +141,14 @@ yadbutton=(
 #                                                                      #
 ########################################################################
 
-# This function will likely later be moved to bl-includes in bunsen-common.
+# This function might later be moved to bl-includes in bunsen-common.
 # see https://forums.bunsenlabs.org/viewtopic.php?id=5570
+# although it has been changed here.
 #
 # Usage: parse_config <file> [<default array name>]
 # If no default array name is given, it defaults to 'config'.
 # If there are [section] headers in file, following entries will be
-#  put in array of that name.
+# put in array of that name.
 # Config arrays may exist already and will be appended to or overwritten.
 # If preexisting array is not associative, function exits with error.
 # New arrays will be created as needed, and remain in the environment.
@@ -158,7 +159,7 @@ parse_config(){
     local line key value comment_regex section_regex entry_regex
     comment_regex="^[[:blank:]]*#"
     section_regex="^[[:blank:]]*\[[[:blank:]]*([[:alpha:]_][[:alnum:]_]*)[[:blank:]]*\][[:blank:]]*(#.*)?$"
-    entry_regex="^[[:blank:]]*([[:alpha:]_][[:alnum:]_-]*)[[:blank:]]*=[[:blank:]]*('[^']+'|\"[^\"]+\"|[^#[:blank:]]+)[[:blank:]]*(#.*)*$"
+    entry_regex="^[[:blank:]]*([[:alpha:]_][[:alnum:]_-]*)[[:blank:]]*=[[:blank:]]*(.*)$" # take whatever is on the RHS of the =, including comments
     while read -r line
     do
         [[ -n $line ]] || continue
@@ -170,12 +171,37 @@ parse_config(){
         }
         [[ $line =~ $entry_regex ]] || continue
         key=${BASH_REMATCH[1]}
-        value=${BASH_REMATCH[2]#[\'\"]} # strip quotes
-        value=${value%[\'\"]}
+        value=${BASH_REMATCH[2]}
         config_array["${key}"]="${value}"
     done < "$1"
 }
 
+# make an array to hold the command string parsed from the user config file
+# Usage: parse_array_from_string <input string> <array name>
+parse_array_from_string() {
+    local input="$1"
+    local result
+    local -n result_array="$2"
+    result=$(python3 -c "import shlex, sys
+text = sys.stdin.read().strip()
+tokens = shlex.split(text, comments='#')
+if len(tokens) == 1:
+    tokens = shlex.split(tokens[0])
+print('\n'.join(tokens))
+" <<< "$input" 2>&1 ) || {
+        yad --text="Syntax error in command:\n$input\n\nDetails:\n$(pangoEscape "$result")" --title="Config Error" --image=dialog-error --name=dialog-error --window-icon=dialog-error
+        return 1
+    }
+    # shellcheck disable=SC2034
+    readarray -t result_array <<< "$result"
+}
+
+pangoEscape() {
+    local string="${1//&/\&amp;}"
+    string="${string//</\&lt;}"
+    string="${string//>/\&gt;}"
+    printf '%s' "$string"
+}
 
 ########################################################################
 
@@ -188,7 +214,7 @@ logoutctl(){
             echo -e "\ncancelled"
             exit 0 ;;
         lock-session )
-            . "$tmplockcmd" || { echo "$O Cannot source $tmplockcmd" >&2; exit 1; }
+            . "$tmplockcmd" || { echo "$0 Cannot source $tmplockcmd" >&2; exit 1; }
             echo -e "\n$1"
             "${LOCK_SCREEN_COMMAND[@]}"
             exit $? ;;
@@ -296,9 +322,11 @@ yad_gui() {
             buttons+=("${yadbutton[$b]}") ;;
         esac
     done
-    yad --class=WmanExit --title "Exit" --close-on-unfocus --undecorated --center --on-top --borders=10 --window-icon=system-log-out --name=system-log-out \
+    yad --class=WmanExit --title "Exit" --close-on-unfocus --undecorated --center --on-top --borders=10 --name=system-log-out --window-icon=system-log-out \
     "${buttons[@]}"
 }
+
+# main script starts here
 
 if [[ -r "$user_config_file" ]]
 then
@@ -316,18 +344,20 @@ get_session_type
 case $session_type in
 x11)
     LOCK_SCREEN_COMMAND=("${XORG_LOCK_SCREEN_COMMAND[@]}")
-    [[ -n "${settings[XORG_LOCK_SCREEN_COMMAND]}" ]] && read -ra LOCK_SCREEN_COMMAND <<<"${settings[XORG_LOCK_SCREEN_COMMAND]}"
+    [[ -n "${settings[XORG_LOCK_SCREEN_COMMAND]}" ]] && parse_array_from_string "${settings[XORG_LOCK_SCREEN_COMMAND]}" LOCK_SCREEN_COMMAND
     ;;
 wayland)
     LOCK_SCREEN_COMMAND=("${WAYLAND_LOCK_SCREEN_COMMAND[@]}")
-    [[ -n "${settings[WAYLAND_LOCK_SCREEN_COMMAND]}" ]] && read -ra LOCK_SCREEN_COMMAND <<<"${settings[WAYLAND_LOCK_SCREEN_COMMAND]}"
+    [[ -n "${settings[WAYLAND_LOCK_SCREEN_COMMAND]}" ]] && parse_array_from_string "${settings[WAYLAND_LOCK_SCREEN_COMMAND]}" LOCK_SCREEN_COMMAND
     ;;
 esac
 command -v "${LOCK_SCREEN_COMMAND[0]}" >/dev/null 2>&1 || {
     echo "$0: ${LOCK_SCREEN_COMMAND[0]} no such command." >&2
+    yad --text="${LOCK_SCREEN_COMMAND[0]}: no such command." --title="Config Error" --image=dialog-error --name=dialog-error --window-icon=dialog-error
     exit 1
 }
 tmplockcmd=$( mktemp ) || { echo "$0 Failed to make tmplockcmd" >&2; exit 1;}
+trap 'rm -f "$tmplockcmd"' EXIT
 declare -p LOCK_SCREEN_COMMAND > "$tmplockcmd"
 export tmplockcmd
 
