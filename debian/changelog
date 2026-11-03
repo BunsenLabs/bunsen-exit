@@ -1,3 +1,12 @@
+bunsen-exit (13.5-1) carbon; urgency=medium
+
+  * Improve parsing of screen-lock commands in bl-exit.conf
+     Commands can contain quoted spaces and escaped hash symbols,
+     but do not need special quoting or escaping otherwise.
+  * This package now depends on python3 to help with the parsing.
+
+ -- John Crawley <john@bunsenlabs.org>  Tue, 03 Nov 2026 18:03:36 +0900
+
 bunsen-exit (13.4-1) carbon; urgency=medium
 
   * Bugfix: logging out of an openbox session resulted in a black screen
