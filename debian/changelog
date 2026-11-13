@@ -1,3 +1,9 @@
+bunsen-exit (13.5.1-1) carbon; urgency=medium
+
+  * Improve icon display on Wayland.
+
+ -- John Crawley <john@bunsenlabs.org>  Fri, 13 Nov 2026 17:16:21 +0900
+
 bunsen-exit (13.5-1) carbon; urgency=medium
 
   * Improve parsing of screen-lock commands in bl-exit.conf
