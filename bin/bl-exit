@@ -189,7 +189,7 @@ if len(tokens) == 1:
     tokens = shlex.split(tokens[0])
 print('\n'.join(tokens))
 " <<< "$input" 2>&1 ) || {
-        yad --text="Syntax error in command:\n$input\n\nDetails:\n$(pangoEscape "$result")" --title="Config Error" --image=dialog-error --name=dialog-error --window-icon=dialog-error
+        yad --text="Syntax error in command:\n$input\n\nDetails:\n$(pangoEscape "$result")" --title="Config Error" --image=dialog-error --name=bl-exit --window-icon=system-log-out
         return 1
     }
     # shellcheck disable=SC2034
@@ -322,7 +322,7 @@ yad_gui() {
             buttons+=("${yadbutton[$b]}") ;;
         esac
     done
-    yad --class=WmanExit --title "Exit" --close-on-unfocus --undecorated --center --on-top --borders=10 --name=system-log-out --window-icon=system-log-out \
+    yad --class=WmanExit --title "Exit" --close-on-unfocus --undecorated --center --on-top --borders=10 --name=bl-exit --window-icon=system-log-out \
     "${buttons[@]}"
 }
 
@@ -353,7 +353,7 @@ wayland)
 esac
 command -v "${LOCK_SCREEN_COMMAND[0]}" >/dev/null 2>&1 || {
     echo "$0: ${LOCK_SCREEN_COMMAND[0]} no such command." >&2
-    yad --text="${LOCK_SCREEN_COMMAND[0]}: no such command." --title="Config Error" --image=dialog-error --name=dialog-error --window-icon=dialog-error
+    yad --text="${LOCK_SCREEN_COMMAND[0]}: no such command." --title="Config Error" --image=dialog-error --name=bl-exit --window-icon=system-log-out
     exit 1
 }
 tmplockcmd=$( mktemp ) || { echo "$0 Failed to make tmplockcmd" >&2; exit 1;}
