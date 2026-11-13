@@ -3,8 +3,7 @@ Section: misc
 Priority: optional
 Maintainer: John Crawley <john@bunsenlabs.org>
 Build-Depends: debhelper-compat (= 13), help2man
-Rules-Requires-Root: no
-Standards-Version: 4.6.2
+Standards-Version: 4.7.2
 Homepage: https://github.com/BunsenLabs/bunsen-exit
 Vcs-Git: https://github.com/BunsenLabs/bunsen-exit.git
 Vcs-Browser: https://github.com/BunsenLabs/bunsen-exit
@@ -17,6 +16,6 @@ Suggests: gtklock
 Replaces: bunsen-utilities (<<9.2-1), bunsen-exit-python
 Breaks: bunsen-utilities (<<9.2-1)
 Conflicts: bunsen-exit-python
-Description: Bunsen logout script.
+Description: BunsenLabs logout script
  logout/suspend/reboot/poweroff script, with a GUI,
  TTY menu and CLI options.
